@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <SolidColorBrush x:Key="SurfaceBrush" Color="#171D2E" />
+  <SolidColorBrush x:Key="PanelBrush" Color="#121727" />
+  <SolidColorBrush x:Key="RaisedBrush" Color="#212940" />
+  <SolidColorBrush x:Key="TextBrush" Color="#EDF0FF" />
+  <SolidColorBrush x:Key="SecondaryBrush" Color="#B8C2D9" />
+  <SolidColorBrush x:Key="MutedBrush" Color="#8E9CB9" />
+  <SolidColorBrush x:Key="DividerBrush" Color="#323D57" />
+  <SolidColorBrush x:Key="HoverBrush" Color="#28324A" />
+  <SolidColorBrush x:Key="AccentBrush" Color="#BCB0FF" />
+  <SolidColorBrush x:Key="AccentSoftBrush" Color="#342B59" />
+  <SolidColorBrush x:Key="DangerBrush" Color="#FF9FB4" />
+  <SolidColorBrush x:Key="DangerSoftBrush" Color="#47283A" />
+  <SolidColorBrush x:Key="OnAccentBrush" Color="#211A3D" />
+  <FontFamily x:Key="BodyFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+  <FontFamily x:Key="MonoFont">Cascadia Code, Consolas</FontFamily>
+  <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+</ResourceDictionary>

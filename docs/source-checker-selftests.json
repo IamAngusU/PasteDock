@@ -1,0 +1,20 @@
+{
+  "validation_type": "Python source-checker self-tests only",
+  "executed_utc": "2026-10-07T09:26:56.145114+00:00",
+  "environment": {
+    "platform": "Linux",
+    "python": "3.13.5"
+  },
+  "tests_run": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "successful": true,
+  "not_validated": [
+    "C# compilation",
+    "C# core tests",
+    "WPF/Win32 runtime",
+    "PowerShell SDK bootstrap and packaging"
+  ],
+  "output": "test_block_comment_preserves_lines (test_source_validator.SourceValidatorTests.test_block_comment_preserves_lines) ... ok\ntest_character_literals (test_source_validator.SourceValidatorTests.test_character_literals) ... ok\ntest_empty_input (test_source_validator.SourceValidatorTests.test_empty_input) ... ok\ntest_escaped_interpolation_braces (test_source_validator.SourceValidatorTests.test_escaped_interpolation_braces) ... ok\ntest_line_comment (test_source_validator.SourceValidatorTests.test_line_comment) ... ok\ntest_nested_interpolation_literal (test_source_validator.SourceValidatorTests.test_nested_interpolation_literal) ... ok\ntest_raw_strings_fail_explicitly (test_source_validator.SourceValidatorTests.test_raw_strings_fail_explicitly) ... ok\ntest_regular_escaped_string (test_source_validator.SourceValidatorTests.test_regular_escaped_string) ... ok\ntest_report_explicitly_leaves_runtime_validation_outstanding (test_source_validator.SourceValidatorTests.test_report_explicitly_leaves_runtime_validation_outstanding) ... ok\ntest_unicode_code_is_preserved (test_source_validator.SourceValidatorTests.test_unicode_code_is_preserved) ... ok\ntest_unterminated_constructs_fail (test_source_validator.SourceValidatorTests.test_unterminated_constructs_fail) ... ok\ntest_verbatim_doubled_quote (test_source_validator.SourceValidatorTests.test_verbatim_doubled_quote) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.084s\n\nOK\n"
+}

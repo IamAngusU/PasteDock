@@ -1,0 +1,812 @@
+{
+  "timestampUtc": "2026-10-19T19:01:49.6027514+00:00",
+  "total": 134,
+  "passed": 134,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Classify JSON before generic code",
+      "status": "passed",
+      "milliseconds": 11,
+      "error": null
+    },
+    {
+      "name": "Classify code",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Classify https URL",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Executable schemes are not links",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Classify RGBA color",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Invalid color is text",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Plain text remains text",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "File reference name supports Windows paths",
+      "status": "passed",
+      "milliseconds": 10,
+      "error": null
+    },
+    {
+      "name": "Fingerprint distinguishes format boundaries",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Fingerprint includes rich text",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Fingerprint ignores derived OCR text",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "UTF-8 size is not UTF-16 length",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Truncation keeps surrogate pairs intact",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Content is not truncated by metadata preview",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Empty payload is rejected",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Payload size rejection is explicit",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Invalid file references are rejected",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Malformed PNG is rejected",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Tags normalize, deduplicate and reject whitespace",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Tags have a fixed maximum count",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Settings normalize bounds and nonfinite geometry",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Settings normalize exclusions",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Quoted search and filters parse together",
+      "status": "passed",
+      "milliseconds": 17,
+      "error": null
+    },
+    {
+      "name": "Unknown filter is a literal search term",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Blank search matches metadata",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Search terms are AND, not OR",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Metadata filters use tag and app case insensitively",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Date filter rejects older copies",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Secret filtering rejects private key markers",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Secret filtering rejects recognizable token shape",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "No claim that ordinary passwords can be recognized",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Excluded source is not captured",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Paused and locked states block capture",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Sensitive clipboard format blocks capture",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Retention removes old unprotected content",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Retention protects pins and favorites",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Retention capacity evicts oldest first",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Protected quota overflow is reported, not deleted",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Storage budget is independent of item count",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Multi-paste preserves order",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Single rich item retains formats",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Plain paste explicitly discards rich formatting",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "File multi-paste deduplicates Windows paths",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Mixed text and files requires queue",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "JSON pretty and compact preserve values",
+      "status": "passed",
+      "milliseconds": 13,
+      "error": null
+    },
+    {
+      "name": "Invalid JSON never silently changes",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Trim and duplicate line transforms",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Base64 round-trip supports Unicode",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Base64 invalid UTF-8 is rejected",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "URL transform round-trip",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "PNG bytes and dimensions survive encrypted round-trip",
+      "status": "passed",
+      "milliseconds": 57,
+      "error": null
+    },
+    {
+      "name": "PNG dimensions must match the file header",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Encrypted repository round-trip preserves complete content",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Index and blobs contain no plaintext canary",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Duplicate copies reuse identity and preserve tags",
+      "status": "passed",
+      "milliseconds": 8,
+      "error": null
+    },
+    {
+      "name": "Concurrent capture is serialized",
+      "status": "passed",
+      "milliseconds": 49,
+      "error": null
+    },
+    {
+      "name": "Cancelled capture does not commit",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Editing changes blob revision, not item identity",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Metadata callback cannot replace identity or content",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Deletion survives reopening and removes blob",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Failed index protection leaves old transaction intact",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Failed edited index keeps original blob readable",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Faulty observer cannot roll back a committed item",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Tampered index is not replaced with empty history",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Missing index never triggers destructive orphan cleanup",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Missing committed payload blocks startup cleanup",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Orphans are removed only after a valid index loads",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Deep search finds text beyond the bounded index",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Pins sort above recency",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Full protected history rejects capture without eviction",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Backup requires a meaningful passphrase length",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Backup authenticates content, passphrase and header",
+      "status": "passed",
+      "milliseconds": 285,
+      "error": null
+    },
+    {
+      "name": "Backup format rejects an arbitrary file",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Import merges without duplicating existing clips",
+      "status": "passed",
+      "milliseconds": 13,
+      "error": null
+    },
+    {
+      "name": "Over-quota import is atomic and does not evict originals",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Encrypted settings round-trip",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Atomic writer keeps destination on cancellation",
+      "status": "passed",
+      "milliseconds": 3,
+      "error": null
+    },
+    {
+      "name": "Import preserves historical dates and copy count",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Undo deletion hides content from search and backups",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Undo restores exact identity rich formats and annotations",
+      "status": "passed",
+      "milliseconds": 12,
+      "error": null
+    },
+    {
+      "name": "Undo survives restart without orphan cleanup deleting its blobs",
+      "status": "passed",
+      "milliseconds": 8,
+      "error": null
+    },
+    {
+      "name": "A later deletion replaces only the previous undo batch",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Failed undo commit preserves both deletion state and stored content",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Failed replacement deletion retains previous undo and live history",
+      "status": "passed",
+      "milliseconds": 10,
+      "error": null
+    },
+    {
+      "name": "Cancelled deletion does not mutate the index",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Cancelled undo leaves restoration available",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Undo expires exactly at the ten minute boundary",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Restart expires an old undo batch before orphan cleanup",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Failed expiry commit never deletes referenced blobs",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Over quota restoration preserves undo rather than evicting live clips",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Deleting unknown IDs does not replace the undo batch",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Permanent deletion also discards the previous undo batch",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Discarding undo never deletes unrelated live clips",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Undo merges a recaptured duplicate without losing annotations",
+      "status": "passed",
+      "milliseconds": 15,
+      "error": null
+    },
+    {
+      "name": "Undo metadata and payload remain encrypted at rest",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Version one history migrates only through a successful commit",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Unknown index version cannot trigger orphan cleanup",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Aliased blob IDs in an index are rejected",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Invalid index fingerprints and copy counts are rejected",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Snapshot collection cannot be replaced by a caller",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Atomic text export preserves Unicode without adding a BOM",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Cancelled export preserves an existing backup and removes temporary files",
+      "status": "passed",
+      "milliseconds": 3,
+      "error": null
+    },
+    {
+      "name": "Failed export rename cleans the staging file",
+      "status": "passed",
+      "milliseconds": 3,
+      "error": null
+    },
+    {
+      "name": "Composition counts separator and UTF8 bytes before joining",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Bounded composition stops loading after exceeding its limit",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Composition cancellation prevents even the first content load",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Async composition preserves selection order",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Composition cannot bypass the hard size limit",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Oversized undo is rejected without allocating or deleting content",
+      "status": "passed",
+      "milliseconds": 12,
+      "error": null
+    },
+    {
+      "name": "A failing observer cannot make undo appear uncommitted",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Plain-text target rules normalize executable names",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Power search parses protected OCR copies and before",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Invalid copies filter remains searchable literal text",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Before filter is an exclusive day boundary",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Protected OCR and copy count filters are all conjunctive",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Temporary file format keeps ambiguous text as txt",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Temporary file format recognizes developer languages conservatively",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Diff identical content has only unchanged lines",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Diff replacement records removal and addition",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Diff insertion does not manufacture a removal",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Diff empty side has no phantom blank removal",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Diff normalizes CRLF and LF",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Whitespace-insensitive diff compares normalized line content",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Unified diff sanitizes labels but preserves line prefixes",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Large edit distance uses bounded fallback",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Diff character budget is explicit",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Diff line budget is explicit",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "File reference check accepts a mixed file and directory selection",
+      "status": "passed",
+      "milliseconds": 1,
+      "error": null
+    },
+    {
+      "name": "Missing file references reject the whole selection with an actionable error",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Cancelled file inspection never probes the filesystem",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "File inspection stops between references after cancellation",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Text-only clips do not need a filesystem probe",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Unified diff has portable LF boundaries for Windows and Unix inputs",
+      "status": "passed",
+      "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Missing file clips remain recoverable after reopening history",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "timestampUtc": "2026-10-19T19:08:44.7334423+00:00",
+  "status": "passed",
+  "validation": "Real WPF construction, data binding and off-screen rendering. Not a manual visual acceptance review.",
+  "clipboardAccessed": false,
+  "inputSynthesized": false,
+  "realWorkspaceOpened": false,
+  "screenshots": [
+    "dark-settings.png",
+    "dark-workspace.png",
+    "light-compact-workspace.png",
+    "light-compare-popup.png",
+    "light-deletion-undo.png",
+    "light-first-use-paused.png",
+    "light-first-use.png",
+    "light-inline-editor.png",
+    "light-invalid-settings.png",
+    "light-no-results.png",
+    "light-settings.png",
+    "light-workspace.png"
+  ],
+  "bindingErrors": [],
+  "checks": [
+    {
+      "name": "History list data binding",
+      "status": "passed"
+    },
+    {
+      "name": "Light workspace and settings rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Dark workspace and settings rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Two-clip diff popover rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Durable deletion undo affordance",
+      "status": "passed"
+    },
+    {
+      "name": "Inline editor rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Empty snippet rejected without losing the editor",
+      "status": "passed"
+    },
+    {
+      "name": "Secret snippet blocked with draft preserved",
+      "status": "passed"
+    },
+    {
+      "name": "Draft survives hide and reopen",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid settings rejected with editable recovery",
+      "status": "passed"
+    },
+    {
+      "name": "Empty search recovery and latest-query cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid JSON leaves original content intact",
+      "status": "passed"
+    },
+    {
+      "name": "Deleted queued clip skipped without clipboard access",
+      "status": "passed"
+    },
+    {
+      "name": "Compact workspace at 720 by 560",
+      "status": "passed"
+    },
+    {
+      "name": "Session lock clears preview and disables paste while preserving draft",
+      "status": "passed"
+    },
+    {
+      "name": "First-use and paused empty states rendered",
+      "status": "passed"
+    }
+  ]
+}

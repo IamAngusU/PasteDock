@@ -1,0 +1,101 @@
+name: Validation and unsigned Windows builds
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Source checker self-tests
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: Source structure checks
+        run: python3 scripts/validate-source.py --report artifacts/reports/source.json
+      - name: Feature presence audit
+        run: python3 scripts/audit-features.py --report artifacts/reports/features.json
+      - name: Portable core regression tests
+        run: dotnet run --project tests/PasteDock.Core.Tests -c Release -- --json artifacts/reports/core-linux.json
+      - name: Upload core reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: core-validation
+          path: artifacts/reports/
+  windows:
+    needs: core
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [win-x64, win-arm64]
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Test, build, and render real WPF smoke views
+        shell: pwsh
+        run: ./scripts/build.ps1 -Runtime ${{ matrix.runtime }}
+      - name: Upload validation reports and UI screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: reports-${{ matrix.runtime }}
+          path: artifacts/reports/
+          if-no-files-found: warn
+      - name: Upload unsigned portable build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: PasteDock-${{ matrix.runtime }}-unsigned
+          path: |
+            artifacts/*.zip
+            artifacts/*.sha256
+          if-no-files-found: error
+      - name: Prepare versioned release files
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $build = Get-Content artifacts/last-successful-build.json -Raw | ConvertFrom-Json
+          $version = (Get-Content Directory.Build.props -Raw | Select-String '<Version>([^<]+)</Version>').Matches.Groups[1].Value
+          New-Item -ItemType Directory -Path release -Force | Out-Null
+          $name = "PasteDock-$version-${{ matrix.runtime }}.zip"
+          Copy-Item -LiteralPath $build.archive -Destination "release/$name"
+          $hash = (Get-FileHash "release/$name" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $name" | Set-Content "release/$name.sha256" -Encoding ascii
+      - name: Upload release files
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-${{ matrix.runtime }}
+          path: release/*
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [core, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: release
+      - name: Publish unsigned preview after all build jobs pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/* --verify-tag --title "PasteDock $GITHUB_REF_NAME" --notes-file .github/RELEASE-NOTES.md --prerelease

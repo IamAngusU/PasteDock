@@ -1,0 +1,32 @@
+name: Report a bug
+description: A reproducible failure, including awkward clipboard and recovery cases.
+body:
+  - type: markdown
+    attributes:
+      value: "Use synthetic examples. Do not include clipboard contents, secrets, private file names or decrypted backups. Security reports belong in private reporting."
+  - type: input
+    id: version
+    attributes:
+      label: PasteDock version and CPU architecture
+      placeholder: 0.4.0 / x64
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and target app
+      description: Mention elevated target apps, multi-monitor scaling, or remote desktop when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: Steps to reproduce
+      description: Include the exact action, expected result and observed behavior using non-sensitive sample content.
+    validations:
+      required: true
+  - type: textarea
+    id: recovery
+    attributes:
+      label: Status message and recovery
+      description: What did PasteDock report? Did retrying, correcting input or reopening help?

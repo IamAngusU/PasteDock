@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- WPF owns DPI via app.manifest; WinForms is used only for the tray and monitor bounds. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <ApplicationIcon>Assets/PasteDock.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Copyright>Copyright © 2026 Angus Uelsmann</Copyright>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>PasteDock</AssemblyName>
+    <RootNamespace>PasteDock.Desktop</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../PasteDock.Core/PasteDock.Core.csproj" /></ItemGroup>
+  <ItemGroup><Resource Include="Assets/PasteDock.ico" /><Resource Include="Assets/PasteDock.png" /></ItemGroup>
+</Project>

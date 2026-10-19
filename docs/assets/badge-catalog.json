@@ -1,0 +1,23 @@
+{
+  "id": "pastedock",
+  "name": "PasteDock",
+  "description": "Repository metadata for the local Windows clipboard workspace.",
+  "target_url": "https://github.com/IamAngusU/PasteDock",
+  "asset_name": "pastedock-badge.svg",
+  "source_url": "https://github.com/IamAngusU/PasteDock/blob/main/docs/assets/pastedock-wordmark.svg",
+  "mark": { "source": "brands/pastedock/pastedock-wordmark.svg", "path_starts": ["M42 23"], "view_box": "4 8 80 80" },
+  "messages": [
+    { "id": "repo-release", "kind": "repository", "eyebrow": "PREVIEW", "short": "0.4.0", "sentence": "PasteDock 0.4.0 preview release" },
+    { "id": "repo-platforms", "kind": "repository", "eyebrow": "WINDOWS", "short": "x64 + ARM64", "sentence": "Windows x64 and ARM64 builds" },
+    { "id": "repo-privacy", "kind": "repository", "eyebrow": "YOUR CLIPBOARD", "short": "Local + encrypted", "sentence": "Clipboard content stays local and is encrypted at rest" },
+    { "id": "repo-tests", "kind": "repository", "eyebrow": "REGRESSION TESTS", "short": "134 core tests", "sentence": "134 executed core regression tests" },
+    { "id": "repo-license", "kind": "repository", "eyebrow": "OPEN SOURCE", "short": "MIT", "sentence": "MIT licensed source" }
+  ],
+  "presets": [
+    { "id": "release", "name": "Release", "description": "Preview release", "message": "repo-release", "layout": "metadata", "theme": "adaptive", "icon": "download" },
+    { "id": "platforms", "name": "Platforms", "description": "Windows architectures", "message": "repo-platforms", "layout": "metadata", "theme": "adaptive", "icon": "platform" },
+    { "id": "privacy", "name": "Privacy", "description": "Local encrypted storage", "message": "repo-privacy", "layout": "metadata", "theme": "adaptive", "icon": "code" },
+    { "id": "tests", "name": "Tests", "description": "Executed core cases", "message": "repo-tests", "layout": "metadata", "theme": "adaptive", "icon": "code" },
+    { "id": "license", "name": "License", "description": "MIT source", "message": "repo-license", "layout": "metadata", "theme": "adaptive", "icon": "code" }
+  ]
+}

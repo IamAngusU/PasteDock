@@ -1,0 +1,20 @@
+<UserControl x:Class="PasteDock.Desktop.Controls.ImageCanvas"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    SizeChanged="CanvasSizeChanged" Loaded="CanvasLoaded">
+  <Grid Background="{DynamicResource PanelBrush}" ClipToBounds="True">
+    <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="16"
+        PreviewMouseWheel="CanvasMouseWheel" PreviewMouseLeftButtonDown="CanvasMouseDown" PreviewMouseMove="CanvasMouseMove"
+        PreviewMouseLeftButtonUp="CanvasMouseUp" LostMouseCapture="CanvasLostCapture">
+      <Image x:Name="Picture" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality">
+        <Image.LayoutTransform><ScaleTransform x:Name="Scale" /></Image.LayoutTransform>
+      </Image>
+    </ScrollViewer>
+    <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,14" Background="{DynamicResource RaisedBrush}" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="1" CornerRadius="9" Padding="3">
+      <StackPanel Orientation="Horizontal">
+        <Button Style="{StaticResource IconButton}" Content="&#xE738;" Click="ZoomOut" ToolTip="Zoom out" AutomationProperties.Name="Zoom out" />
+        <Button x:Name="ZoomLabel" Content="Fit" MinWidth="56" Click="ToggleFit" ToolTip="Toggle fit / actual preview size" />
+        <Button Style="{StaticResource IconButton}" Content="&#xE710;" Click="ZoomIn" ToolTip="Zoom in" AutomationProperties.Name="Zoom in" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

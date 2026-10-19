@@ -1,0 +1,138 @@
+# PasteDock 0.3.0 source diff against 0.2.0 baseline
+
+Baseline commit:
+```
+8be8545f91b507ff188078d0b38ed8d57ce57d59
+```
+
+## Summary
+```
+ .github/workflows/windows.yml                      |   2 +
+ .gitignore                                         |   3 +
+ CHANGELOG.md                                       |  25 +++
+ Directory.Build.props                              |   2 +-
+ README.md                                          |  22 ++-
+ START-HERE.md                                      |  12 +-
+ docs/ARCHITECTURE.md                               |  10 ++
+ docs/FEATURE-MAP.md                                |  23 +++
+ docs/MIGRATION.md                                  |  36 ++--
+ docs/PRODUCT-AUDIT.md                              |  65 +++++++
+ docs/SECURITY.md                                   |  14 ++
+ docs/TECHNICAL-REFERENCES.md                       |   9 +
+ docs/V030-DIFF-AUDIT.md                            |  36 ++++
+ docs/VALIDATION.md                                 |  24 ++-
+ docs/feature-presence.json                         |  95 +++++++++++
+ docs/static-validation.json                        |  31 ++--
+ scripts/audit-features.py                          | 165 ++++++++++++++++++
+ scripts/tests/test_feature_audit.py                |  34 ++++
+ scripts/tests/test_source_validator.py             |   2 +-
+ scripts/validate-source.py                         |  25 +++
+ src/PasteDock.Core/Models/AppSettings.cs           |  12 +-
+ src/PasteDock.Core/Search/SearchMatcher.cs         |   4 +
+ src/PasteDock.Core/Search/SearchQuery.cs           |  14 ++
+ src/PasteDock.Core/Services/TextDiff.cs            | 189 +++++++++++++++++++++
+ .../Services/TextFileFormatGuesser.cs              |  91 ++++++++++
+ .../Services/TemporaryPasteFileService.cs          |  97 +++++++++++
+ .../Services/UiSmokeDiagnostics.cs                 |  38 ++++-
+ src/PasteDock.Desktop/Services/WorkspaceService.cs |   4 +
+ src/PasteDock.Desktop/Themes/Tokens.Dark.xaml      |   1 +
+ src/PasteDock.Desktop/Themes/Tokens.Light.xaml     |   1 +
+ .../ViewModels/ClipItemViewModel.cs                |   3 +
+ .../ViewModels/SettingsViewModel.cs                |   5 +-
+ .../ViewModels/ShellViewModel.Compare.cs           | 114 +++++++++++++
+ .../ViewModels/ShellViewModel.Power.cs             | 169 ++++++++++++++++++
+ src/PasteDock.Desktop/ViewModels/ShellViewModel.cs |  57 +++++--
+ src/PasteDock.Desktop/Views/MainWindow.xaml        |  63 ++++++-
+ src/PasteDock.Desktop/Views/MainWindow.xaml.cs     |  24 ++-
+ tests/PasteDock.Core.Tests/Program.cs              |   1 +
+ tests/PasteDock.Core.Tests/V030Tests.cs            | 109 ++++++++++++
+ 39 files changed, 1564 insertions(+), 67 deletions(-)
+```
+
+## Name status
+```
+M	.github/workflows/windows.yml
+M	.gitignore
+M	CHANGELOG.md
+M	Directory.Build.props
+M	README.md
+M	START-HERE.md
+M	docs/ARCHITECTURE.md
+A	docs/FEATURE-MAP.md
+M	docs/MIGRATION.md
+A	docs/PRODUCT-AUDIT.md
+M	docs/SECURITY.md
+M	docs/TECHNICAL-REFERENCES.md
+A	docs/V030-DIFF-AUDIT.md
+M	docs/VALIDATION.md
+A	docs/feature-presence.json
+M	docs/static-validation.json
+A	scripts/audit-features.py
+A	scripts/tests/test_feature_audit.py
+M	scripts/tests/test_source_validator.py
+M	scripts/validate-source.py
+M	src/PasteDock.Core/Models/AppSettings.cs
+M	src/PasteDock.Core/Search/SearchMatcher.cs
+M	src/PasteDock.Core/Search/SearchQuery.cs
+A	src/PasteDock.Core/Services/TextDiff.cs
+A	src/PasteDock.Core/Services/TextFileFormatGuesser.cs
+A	src/PasteDock.Desktop/Services/TemporaryPasteFileService.cs
+M	src/PasteDock.Desktop/Services/UiSmokeDiagnostics.cs
+M	src/PasteDock.Desktop/Services/WorkspaceService.cs
+M	src/PasteDock.Desktop/Themes/Tokens.Dark.xaml
+M	src/PasteDock.Desktop/Themes/Tokens.Light.xaml
+M	src/PasteDock.Desktop/ViewModels/ClipItemViewModel.cs
+M	src/PasteDock.Desktop/ViewModels/SettingsViewModel.cs
+A	src/PasteDock.Desktop/ViewModels/ShellViewModel.Compare.cs
+A	src/PasteDock.Desktop/ViewModels/ShellViewModel.Power.cs
+M	src/PasteDock.Desktop/ViewModels/ShellViewModel.cs
+M	src/PasteDock.Desktop/Views/MainWindow.xaml
+M	src/PasteDock.Desktop/Views/MainWindow.xaml.cs
+M	tests/PasteDock.Core.Tests/Program.cs
+A	tests/PasteDock.Core.Tests/V030Tests.cs
+```
+
+## Numeric diff
+```
+2	0	.github/workflows/windows.yml
+3	0	.gitignore
+25	0	CHANGELOG.md
+1	1	Directory.Build.props
+13	9	README.md
+6	6	START-HERE.md
+10	0	docs/ARCHITECTURE.md
+23	0	docs/FEATURE-MAP.md
+25	11	docs/MIGRATION.md
+65	0	docs/PRODUCT-AUDIT.md
+14	0	docs/SECURITY.md
+9	0	docs/TECHNICAL-REFERENCES.md
+36	0	docs/V030-DIFF-AUDIT.md
+18	6	docs/VALIDATION.md
+95	0	docs/feature-presence.json
+19	12	docs/static-validation.json
+165	0	scripts/audit-features.py
+34	0	scripts/tests/test_feature_audit.py
+1	1	scripts/tests/test_source_validator.py
+25	0	scripts/validate-source.py
+9	3	src/PasteDock.Core/Models/AppSettings.cs
+4	0	src/PasteDock.Core/Search/SearchMatcher.cs
+14	0	src/PasteDock.Core/Search/SearchQuery.cs
+189	0	src/PasteDock.Core/Services/TextDiff.cs
+91	0	src/PasteDock.Core/Services/TextFileFormatGuesser.cs
+97	0	src/PasteDock.Desktop/Services/TemporaryPasteFileService.cs
+36	2	src/PasteDock.Desktop/Services/UiSmokeDiagnostics.cs
+4	0	src/PasteDock.Desktop/Services/WorkspaceService.cs
+1	0	src/PasteDock.Desktop/Themes/Tokens.Dark.xaml
+1	0	src/PasteDock.Desktop/Themes/Tokens.Light.xaml
+3	0	src/PasteDock.Desktop/ViewModels/ClipItemViewModel.cs
+4	1	src/PasteDock.Desktop/ViewModels/SettingsViewModel.cs
+114	0	src/PasteDock.Desktop/ViewModels/ShellViewModel.Compare.cs
+169	0	src/PasteDock.Desktop/ViewModels/ShellViewModel.Power.cs
+47	10	src/PasteDock.Desktop/ViewModels/ShellViewModel.cs
+59	4	src/PasteDock.Desktop/Views/MainWindow.xaml
+23	1	src/PasteDock.Desktop/Views/MainWindow.xaml.cs
+1	0	tests/PasteDock.Core.Tests/Program.cs
+109	0	tests/PasteDock.Core.Tests/V030Tests.cs
+```
+
+This report is source inventory only. It does not claim successful compilation or Windows runtime validation.

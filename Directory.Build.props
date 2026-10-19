@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14.0</LangVersion>
+    <Deterministic>true</Deterministic>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <Version>0.4.0</Version>
+    <Product>PasteDock</Product>
+    <Description>A private, keyboard-first clipboard workspace for Windows.</Description>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+</Project>

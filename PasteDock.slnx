@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PasteDock.Core/PasteDock.Core.csproj" />
+    <Project Path="src/PasteDock.Desktop/PasteDock.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PasteDock.Core.Tests/PasteDock.Core.Tests.csproj" />
+  </Folder>
+</Solution>

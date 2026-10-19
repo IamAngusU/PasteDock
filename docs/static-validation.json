@@ -1,0 +1,117 @@
+{
+  "product": "PasteDock",
+  "validation_type": "source-static-only",
+  "environment": {
+    "platform": "Linux",
+    "python": "3.13.5",
+    "dotnet_on_path": false
+  },
+  "status": "passed-with-runtime-validation-outstanding",
+  "counts": {
+    "files_examined": 95,
+    "csharp_files": 54,
+    "csharp_lines": 5593,
+    "xaml_files": 6,
+    "declared_core_tests": 127
+  },
+  "checks": [
+    {
+      "name": "XML well-formedness",
+      "status": "passed",
+      "checked_count": 12,
+      "scope": "XML syntax only; not WPF schema compilation",
+      "errors": []
+    },
+    {
+      "name": "Project and resource-dictionary files",
+      "status": "passed",
+      "checked_count": 7,
+      "scope": "Relative file existence",
+      "errors": []
+    },
+    {
+      "name": "C# outer delimiter balance",
+      "status": "passed",
+      "checked_count": 54,
+      "scope": "Comments/literals masked; interpolation internals skipped; not type checking or compilation",
+      "errors": []
+    },
+    {
+      "name": "XAML code-behind and declared events",
+      "status": "passed",
+      "checked_count": 41,
+      "scope": "Matching class names and handler method names; not delegate signature checking",
+      "errors": []
+    },
+    {
+      "name": "XAML resource and named-element references",
+      "status": "passed",
+      "checked_count": 277,
+      "scope": "Aggregate resource-key existence and per-file names; not runtime resource scope/binding validation",
+      "errors": []
+    },
+    {
+      "name": "Theme token parity",
+      "status": "passed",
+      "checked_count": 16,
+      "scope": "Light and dark token dictionaries declare the same keys",
+      "errors": []
+    },
+    {
+      "name": "Named test declarations",
+      "status": "passed",
+      "checked_count": 127,
+      "scope": "Declared test names only; no test has been executed by this validator",
+      "errors": []
+    },
+    {
+      "name": "Narrow source safety checks",
+      "status": "passed",
+      "checked_count": 61,
+      "scope": "No listed networking/shell/deserialization APIs in implementation; selected clipboard guards present. Not a security audit.",
+      "errors": []
+    },
+    {
+      "name": "Packaging exclusions and unfinished-code markers",
+      "status": "passed",
+      "checked_count": 95,
+      "scope": "No bundled font files or TODO/FIXME/NotImplementedException markers; not a completeness claim",
+      "errors": []
+    },
+    {
+      "name": "JSON syntax",
+      "status": "passed",
+      "checked_count": 4,
+      "scope": "JSON parsing",
+      "errors": []
+    },
+    {
+      "name": "v0.2 data-loss and smoke isolation guards",
+      "status": "passed",
+      "checked_count": 19,
+      "scope": "Narrow reviewed call-site presence/absence checks only; does not execute storage, bootstrap or WPF code",
+      "errors": []
+    },
+    {
+      "name": "v0.3 competitor-gap source guards",
+      "status": "passed",
+      "checked_count": 29,
+      "scope": "Source-presence and reviewed shortcut-boundary guards for the v0.3 additions; not runtime validation",
+      "errors": []
+    }
+  ],
+  "not_performed": [
+    "C# compilation/type checking",
+    "Core test execution",
+    "Windows application launch",
+    "DPAPI/clipboard/SendInput/OCR runtime checks",
+    "WPF layout and accessibility review",
+    "PowerShell SDK bootstrap and packaging execution",
+    "Windows ARM64 runtime validation"
+  ],
+  "limitations": [
+    "Structural checks cannot establish buildability or runtime correctness.",
+    "Source safety checks do not constitute a security audit.",
+    "Use scripts/test.ps1, scripts/build.ps1 and docs/VALIDATION.md on Windows."
+  ]
+}

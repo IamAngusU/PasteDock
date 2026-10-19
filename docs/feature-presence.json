@@ -1,0 +1,95 @@
+{
+  "product": "PasteDock",
+  "audit_type": "source-presence-not-runtime-validation",
+  "features": [
+    {
+      "feature": "independent-local-history",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "type-to-search-on-open",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "pins-favorites-tags",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "multi-select-and-paste-queue",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "local-ocr",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "privacy-app-exclusions",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "encrypted-backup",
+      "introduced": "baseline",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "encrypted-delete-undo",
+      "introduced": "0.2",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "bounded-two-clip-diff",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "quick-paste-alt-1-9",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "paste-as-temporary-file",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "source-privacy-actions",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "per-target-plain-text-rules",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    },
+    {
+      "feature": "advanced-search-operators",
+      "introduced": "0.3",
+      "source_presence": "present",
+      "missing": []
+    }
+  ],
+  "summary": {
+    "total": 14,
+    "present": 14,
+    "missing": 0
+  }
+}

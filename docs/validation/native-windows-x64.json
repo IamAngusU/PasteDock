@@ -1,0 +1,111 @@
+{
+  "timestampUtc": "2026-10-19T19:04:28.0199508+00:00",
+  "status": "passed",
+  "runtime": ".NET 10.0.12",
+  "os": "Microsoft Windows 10.0.26200",
+  "architecture": "X64",
+  "clipboardModified": false,
+  "inputSynthesized": false,
+  "checks": [
+    {
+      "name": "Windows input structure layout",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Current-user DPAPI round-trip and tamper rejection",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Interactive Default desktop",
+      "status": "available",
+      "detail": "Informational only; no input is sent."
+    },
+    {
+      "name": "Clipboard sequence API",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "STA clipboard listener registration",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Installed offline OCR languages",
+      "status": "available",
+      "detail": "de-DE, en-US"
+    },
+    {
+      "name": "Paste: missing target copies without hiding",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: exited or reused target sends no input",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: activation refusal sends no input",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: held shortcut keys stop automatic paste",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: focus change before injection sends no input",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: secure desktop sends no input",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: session locks after copy",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: newer clipboard sequence wins",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: partial injection releases synthetic modifiers",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: blocked injection does not release user modifiers",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: successful paste sends exactly one sequence",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: expired request keeps retry available",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: caller cancellation performs no clipboard write",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    },
+    {
+      "name": "Paste: concurrent paste is rejected without replay",
+      "status": "passed",
+      "detail": "Fake OS boundary; no clipboard writes or input."
+    }
+  ]
+}
