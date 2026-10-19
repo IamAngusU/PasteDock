@@ -1,9 +1,15 @@
-PasteDock 0.4.0 is a native, local Windows clipboard workspace with encrypted history, complete-content search, snippets, text tools, image inspection, offline OCR, queueing and portable backups.
+PasteDock 0.5.0 makes the local clipboard workspace easier to use every day.
 
-This preview adds a consistent violet identity, a shared app/tray icon, corrected dark-mode contrast, actionable first-use and no-results states, safer missing-file handling and draft recovery. It fixes the QuickKey binding crash and recursive error-dialog failure in the supplied 0.3.0 source.
+- Review and reorder the actual paste queue; remove one occurrence or use Copy & advance for manual paste. Failures retain the entry, and repeated clips have distinct completion tickets.
+- Give clips durable names with F2. Names survive editing, repeat capture and encrypted backup.
+- Keep your own notes in My snippets. Saved snippets survive automatic retention and remain snippets after re-copying from another app.
+- Exclude words, phrases, apps, tags and content types. Deep search also checks negative terms beyond the instant index.
+- Choose among five sort orders. Filter controls stay reachable in a narrow window.
+- Read errors in a wrapping recovery banner, review draft discard, inspect CSS colors, wrap text and navigate the command menu with arrows. Theme-aware scrollbars work in both directions.
+- Save sort/wrap preferences with window settings.
 
-Executed local checks: 134 core regression tests, 16 Python tooling tests, 16 WPF scenario groups and 14 simulated paste scenarios, plus native DPAPI/input-layout/listener checks. GitHub CI results are available in the workflow. [Details and remaining acceptance](https://github.com/IamAngusU/PasteDock/blob/main/docs/RELEASE-VALIDATION.md).
+Executed local validation: **167 core tests, 16 Python tooling tests, 25 WPF scenario groups and 14 simulated paste scenarios**, plus native Windows checks. Reports and remaining limits are documented in [release validation](https://github.com/IamAngusU/PasteDock/blob/main/docs/RELEASE-VALIDATION.md).
 
-Download the ZIP for your architecture, extract the whole folder, and open PasteDock.exe. The runtime is included. Press Ctrl+Alt+V to open the workspace. No administrator account or sign-in is required.
+Extract the entire ZIP for your CPU and open PasteDock.exe. The runtime is included. Ctrl+Alt+V opens the workspace. No administrator account or sign-in is required.
 
-These are **unsigned preview builds**. x64 has been executed locally. ARM64 is cross-compiled and has not yet been accepted on native ARM hardware. Full manual target-app, remote-desktop and multi-monitor acceptance remains outstanding. SHA-256 files are download integrity checks, not publisher signatures.
+These are **unsigned preview builds**. x64 has been executed locally; ARM64 is cross-compiled and native acceptance remains outstanding. Full manual target-app, remote-desktop and multi-monitor acceptance is still open. Hosted CI results must be read separately; no hosted pass is claimed when account execution prevents jobs from starting. SHA-256 files check download integrity, not publisher identity.

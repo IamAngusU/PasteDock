@@ -1,29 +1,25 @@
-# PasteDock 0.4.0 validation
+# PasteDock 0.5.0 validation
 
-Executed on **19 October 2026**, on Windows x64 with .NET SDK **10.0.401**. These are release checks by the maintainer, not an independent audit. GitHub Actions repeats core tests on Linux and builds Windows x64/ARM64; its live result is separate from this local snapshot.
+Executed on **19 October 2026**, Windows x64, with the .NET SDK selected by global.json. This is maintainer testing, not an independent audit.
 
-**Hosted CI has not executed this release.** The initial push and a manual dispatch both stopped before job creation with `startup_failure`; no runner, steps or hosted test results were produced. The workflow passes `actionlint 1.7.7` locally. This release is backed by the executed local reports below, not by a green GitHub Actions run. Once account execution is available, dispatch `windows.yml` again to obtain hosted Linux and Windows evidence.
+- **167/167 core regression tests passed.** Includes thirty-three additions for search exclusions, quoted operators, deep negative matching, deterministic sorting, queue tickets/reordering/capacity, durable names, backups, snippet identity/retention, CSS alpha and settings recovery. [Executed core report](validation/core-windows-x64.json).
+- **16/16 Python tooling tests passed.** Source structure validation and the feature audit also pass. Static checks do not establish runtime behavior.
+- **25 WPF scenario groups** cover the real views in isolated synthetic storage: queue edits and failed copy recovery, rename validation, image/color inspectors, scrollbars and text wrapping, snippet filters, view preferences, search help/exclusions, palette availability, draft discard review, plus previous settings, search, deletion, lock and narrow-layout checks. [Executed UI report](validation/ui-windows-x64.json).
+- **14 simulated paste scenarios** exercise the real paste coordinator through fake OS boundaries. Native checks also exercise DPAPI round-trip/tamper rejection, INPUT layout, clipboard sequence API and a paused STA listener. [Executed native report](validation/native-windows-x64.json).
+- The Windows solution compiles with zero warnings and zero errors. SHA-pinned GitHub Actions are configured for Linux core tests and Windows x64/ARM64 packaging.
 
-- **134/134 core regression tests passed.** Storage transactions, tampering, quota refusal, cancellation, undo durability, backup authentication, import atomicity, search, transforms, bounded diff and missing file references. [Executed JSON](validation/core-windows-x64.json).
-- **16/16 Python tooling tests passed.** Includes a Windows text-decoding fix in the source checker. The static validator and 14-item feature-presence audit also passed. Static checks alone do not establish runtime correctness.
-- **Windows solution build passed with zero warnings and zero errors.** WPF's manifest owns per-monitor DPI; the WinForms-only DPI analyzer is explicitly suppressed because WinForms is used for tray and monitor bounds.
-- **16 WPF UI scenario groups passed**, with no binding errors. Light/dark settings and workspace, diff, undo, inline editing, empty/secret snippet rejection, invalid settings, invalid JSON, cancelled searches, no-results recovery, deleted queue entries, preserved drafts, session lock and a 720 × 560 layout. [Executed JSON](validation/ui-windows-x64.json).
-- **14 simulated paste scenarios passed**, exercising the actual paste coordinator through fake clipboard/desktop boundaries. Missing or reused target, activation refusal, held modifiers, changed focus, locked/secure desktop, newer clipboard sequence, blocked or partial input, caller cancellation, timeout recovery, concurrent requests and success. Native checks also passed for DPAPI round-trip/tamper rejection, Windows INPUT layout, clipboard sequence API and paused STA listener registration. [Executed JSON](validation/native-windows-x64.json).
+Diagnostics do not replace the user's clipboard or inject real keystrokes. WPF screenshots are actual application renders with synthetic clips. Queue-copy failure is tested using an unavailable clipboard service, so it cannot write real content. Simulated paste tests establish coordinator decisions, not compatibility with every target app.
 
-The diagnostics do not overwrite the user's clipboard or inject real keystrokes. UI checks use a temporary synthetic workspace and remove it afterward. Simulated paste checks test the coordinator, not the behavior of every third-party target application.
+## Compatibility and storage
 
-## Fixed from the supplied 0.3.0 source
+The encrypted history schema stays at version 2. New custom-name and snippet flags are additive. Legacy clips from the exact PasteDock source are treated as saved snippets and are protected from retention. Names, snippet identity and view preferences are exercised through encrypted storage and backup round-trips.
 
-The first baseline run had **125/127** passing core tests and crashed in the actual WPF view. A `Run.Text` binding attempted to write into the read-only QuickKey property. The unhandled-error dialog recursively re-entered failing layout and overflowed the stack. The release makes the binding one-way, prevents recursive error handling and writes diagnostic failures without modal dialogs.
+The queue is in memory. Windows lock or quitting clears it. Draft discard review protects ordinary cancellation; drafts are not crash-recovery autosaves. Existing complete-content, DPAPI, quota and backup limits remain in force.
 
-Two Windows-specific failures were also resolved: diff exports now use deterministic LF boundaries, and the export staging test accepts Windows' actual access-denied result for a directory destination. The assertion still checks that the original directory survives and staging files are removed.
+## Hosted CI and remaining acceptance
 
-Visual inspection caught inherited font/foreground problems that made icon buttons unreadable and dark-mode titles black. Control inheritance, theme brushes and the high-resolution mark were corrected, then the real views were rendered again.
+The previous release's hosted runs stopped before job creation with startup_failure. A hosted pass is not inferred from local results. See the [current workflow](https://github.com/IamAngusU/PasteDock/actions/workflows/windows.yml) for the latest status. If account execution remains unavailable, the release is supported by the attached local reports only.
 
-## Remaining acceptance limits
+**x64** is executed locally. **ARM64** is cross-compiled and has not been run on native ARM hardware. Native/UI checks are explicitly skipped on mismatched build hosts. Both packages are unsigned previews.
 
-The **x64** build has been executed locally. The **ARM64** build is cross-compiled; it has not been run on native ARM hardware. CI records skipped native checks explicitly for a mismatched host architecture.
-
-Before a stable release, manually exercise actual paste into several target apps, an elevated target, remote desktop, clipboard ownership contention, multiple monitors at 100/150/200% scaling, sleep/resume and the desired OCR languages. The tests cover coordinator decisions and synthetic WPF state; they are not a substitute for that native desktop acceptance.
-
-Packages are **unsigned preview builds**. SHA-256 files detect a mismatched download; they are not publisher signatures. The app has no automatic updater. Pins/favorites may fill a quota, file clips may outlive their sources and DPAPI still depends on the original Windows profile. See [privacy and recovery limits](SECURITY.md).
+Full manual acceptance remains outstanding for actual paste across third-party apps, elevated targets, remote desktop, clipboard contention, sleep/resume and mixed-monitor scaling. SHA-256 checks integrity; it is not a publisher signature. [Privacy and recovery model](SECURITY.md). [0.4.0 validation snapshot](https://github.com/IamAngusU/PasteDock/blob/v0.4.0/docs/RELEASE-VALIDATION.md).

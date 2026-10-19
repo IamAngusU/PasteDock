@@ -65,6 +65,7 @@ public sealed class HistoryRepository
                 {
                     LastCopiedAt = fresh.LastCopiedAt,
                     SourceApp = fresh.SourceApp,
+                    IsSnippet = existing.IsSnippet || existing.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
                     CopyCount = existing.CopyCount == int.MaxValue ? int.MaxValue : existing.CopyCount + 1
                 };
                 await CommitAsync(current.Select(e => e.Id == updated.Id ? updated : e).ToArray(), ct).ConfigureAwait(false);
@@ -72,7 +73,7 @@ public sealed class HistoryRepository
             }
             var plan = RetentionPolicy.Plan(current.Append(fresh), settings, _timeProvider.GetUtcNow());
             if (plan.ProtectedQuotaExceeded || !plan.Kept.Any(e => e.Id == fresh.Id))
-                throw new InvalidOperationException("History is full of protected items. Unpin items or increase the limit.");
+                throw new InvalidOperationException("History is full of protected items. Delete unused snippets, unpin items or increase the limit.");
             await _store.SavePayloadAsync(fresh.BlobId, payload, ct).ConfigureAwait(false);
             wroteBlob = true;
             await CommitAsync(plan.Kept.ToArray(), ct).ConfigureAwait(false);
@@ -113,6 +114,7 @@ public sealed class HistoryRepository
                 return entry with
                 {
                     Title = ClipFactory.Truncate(edited.Title.Trim(), 150),
+                    HasCustomTitle = edited.HasCustomTitle,
                     IsPinned = edited.IsPinned,
                     IsFavorite = edited.IsFavorite,
                     Tags = ClipFactory.NormalizeTags(edited.Tags),
@@ -135,6 +137,8 @@ public sealed class HistoryRepository
             replacement = replacement with
             {
                 Id = previous.Id, CreatedAt = previous.CreatedAt, IsPinned = previous.IsPinned,
+                Title = previous.HasCustomTitle ? previous.Title : replacement.Title, HasCustomTitle = previous.HasCustomTitle,
+                IsSnippet = previous.IsSnippet || previous.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
                 IsFavorite = previous.IsFavorite, Tags = previous.Tags, CopyCount = previous.CopyCount,
                 LastPastedAt = previous.LastPastedAt, SourceApp = previous.SourceApp
             };
@@ -276,7 +280,23 @@ public sealed class HistoryRepository
         finally { _gate.Release(); }
     }
 
-    public async Task<IReadOnlyList<ClipEntry>> SearchAsync(SearchQuery query, CancellationToken ct = default)
+    public async Task RenameAsync(Guid id, string title, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(title);
+        title = title.Trim();
+        if (title.Length is < 1 or > 150 || title.Any(char.IsControl))
+            throw new ArgumentException("Use a name of 1–150 characters on a single line.");
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            if (!_entries.Any(entry => entry.Id == id)) throw new KeyNotFoundException("This item no longer exists.");
+            await CommitAsync(_entries.Select(entry => entry.Id == id ? entry with { Title = title, HasCustomTitle = true } : entry).ToArray(), ct)
+                .ConfigureAwait(false);
+        }
+        finally { _gate.Release(); }
+    }
+
+    public async Task<IReadOnlyList<ClipEntry>> SearchAsync(SearchQuery query, CancellationToken ct = default, SearchSort sort = SearchSort.BestMatch)
     {
         var snapshot = _entries;
         var matches = new List<ClipEntry>();
@@ -284,8 +304,8 @@ public sealed class HistoryRepository
         {
             ct.ThrowIfCancellationRequested();
             if (!SearchMatcher.MatchesMetadata(entry, query)) continue;
-            if (SearchMatcher.MatchesText(entry, query)) { matches.Add(entry); continue; }
-            if (!query.DeepSearch || query.Terms.Length == 0) continue;
+            if (SearchMatcher.MatchesText(entry, query) && (!query.DeepSearch || query.ExcludedTerms.Length == 0)) { matches.Add(entry); continue; }
+            if (!query.DeepSearch || (query.Terms.Length == 0 && query.ExcludedTerms.Length == 0)) continue;
             try
             {
                 var payload = await LoadAsync(entry.Id, ct).ConfigureAwait(false);
@@ -293,9 +313,7 @@ public sealed class HistoryRepository
             }
             catch (KeyNotFoundException) { } // Item was removed after the search snapshot.
         }
-        return matches.OrderByDescending(e => e.IsPinned)
-            .ThenByDescending(e => query.Terms.Length == 0 ? 0 : SearchMatcher.Score(e, query))
-            .ThenByDescending(e => e.LastCopiedAt).ToArray();
+        return SearchOrdering.Apply(matches, query, sort);
     }
 
     public async Task<IReadOnlyList<BackupItem>> ExportAsync(CancellationToken ct = default)
@@ -335,6 +353,8 @@ public sealed class HistoryRepository
                 fresh = fresh with
                 {
                     Title = ClipFactory.Truncate(item.Entry.Title, 150),
+                    HasCustomTitle = item.Entry.HasCustomTitle,
+                    IsSnippet = item.Entry.IsSnippet || item.Entry.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
                     IsPinned = item.Entry.IsPinned, IsFavorite = item.Entry.IsFavorite,
                     Tags = ClipFactory.NormalizeTags(item.Entry.Tags),
                     CreatedAt = item.Entry.CreatedAt, LastCopiedAt = item.Entry.LastCopiedAt,

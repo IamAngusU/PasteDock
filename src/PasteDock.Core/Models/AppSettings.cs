@@ -17,6 +17,8 @@ public sealed record AppSettings
     public bool KeepWindowOnTop { get; init; } = true;
     public bool ReducedMotion { get; init; }
     public string Theme { get; init; } = "Light";
+    public PasteDock.Core.Search.SearchSort HistorySort { get; init; } = PasteDock.Core.Search.SearchSort.BestMatch;
+    public bool PreviewWrap { get; init; } = true;
     public uint HotkeyModifiers { get; init; } = 3; // MOD_ALT | MOD_CONTROL
     public uint HotkeyKey { get; init; } = 0x56;    // V
     public string HotkeyLabel { get; init; } = "Ctrl + Alt + V";
@@ -34,6 +36,7 @@ public sealed record AppSettings
         ExcludedApps = NormalizeApps(ExcludedApps),
         PlainTextPasteApps = NormalizeApps(PlainTextPasteApps),
         Theme = Theme == "Dark" ? "Dark" : "Light",
+        HistorySort = Enum.IsDefined(HistorySort) ? HistorySort : PasteDock.Core.Search.SearchSort.BestMatch,
         JoinSeparator = (JoinSeparator ?? "\n\n")[..Math.Min(JoinSeparator?.Length ?? 2, 80)],
         WindowWidth = double.IsFinite(WindowWidth) ? Math.Clamp(WindowWidth, 860, 2200) : 1080,
         WindowHeight = double.IsFinite(WindowHeight) ? Math.Clamp(WindowHeight, 560, 1500) : 700,

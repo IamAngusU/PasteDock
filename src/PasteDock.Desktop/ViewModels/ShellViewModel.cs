@@ -17,7 +17,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     private readonly WorkspaceService _workspace;
     private readonly Dispatcher _dispatcher;
     private readonly List<AsyncRelayCommand> _asyncCommands = [];
-    private readonly Queue<Guid> _queue = new();
+    private readonly PasteQueue _queue = new();
     private readonly DispatcherTimer _clock;
     private CancellationTokenSource? _searchCancellation, _previewCancellation;
     private ClipPayload? _loaded;
@@ -39,7 +39,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     public ObservableCollection<ClipItemViewModel> Items { get; } = [];
     public ObservableCollection<FilterOption> Filters { get; } =
     [
-        new("all", "All history", "\uE81C"), new("pinned", "Pinned", "\uE718"), new("favorites", "Favorites", "\uE734"),
+        new("all", "All history", "\uE81C"), new("pinned", "Pinned", "\uE718"), new("snippets", "My snippets", "\uE70F"), new("favorites", "Favorites", "\uE734"),
         new("text", "Text & code", "\uE8A5"), new("image", "Images", "\uEB9F"), new("link", "Links", "\uE71B"), new("files", "Files", "\uE8B7")
     ];
     public ObservableCollection<string> AvailableTags { get; } = [];
@@ -60,6 +60,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         new("Ctrl Alt V", "Open or hide PasteDock (configurable)"), new("Ctrl Alt N", "Paste the next queued item globally"),
         new("Enter", "Paste selection"), new("Shift Enter", "Paste as plain text"), new("Ctrl C", "Copy selected clips"),
         new("Ctrl P / Ctrl B", "Pin / favorite"), new("Ctrl E / Ctrl N", "Edit / new snippet"),
+        new("F2", "Rename the current clip"),
         new("Alt 1...9", "Paste one of the first nine visible results immediately"), new("Ctrl D", "Compare exactly two selected clips"),
         new("Ctrl Z", "Undo the last deletion (outside text inputs)"), new("Ctrl T", "Add tags"), new("Ctrl Q", "Queue selected clips, top to bottom"), new("Delete", "Review deletion"),
         new("Ctrl K", "Command menu"), new("Ctrl F", "Focus search"), new("Ctrl ,", "Settings"),
@@ -128,9 +129,9 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     public bool PreviewBusy { get => _previewBusy; private set => Set(ref _previewBusy, value); }
     public bool IsEditing { get => _isEditing; private set { if (Set(ref _isEditing, value)) { Raise(nameof(IsBrowsing)); Raise(nameof(HasPreview)); RefreshCommands(); } } }
     public bool IsBrowsing => !IsEditing;
-    public string EditText { get => _editText; set => Set(ref _editText, value); }
+    public string EditText { get => _editText; set { if (Set(ref _editText, value)) Raise(nameof(EditDirty)); } }
     public bool ShowImage { get => _showImage; set { if (Set(ref _showImage, value)) Raise(nameof(ShowText)); } }
-    public bool ShowText => !ShowImage;
+    public bool ShowText => !ShowImage && !ShowColor;
     public bool SettingsOpen { get => _settingsOpen; set => Set(ref _settingsOpen, value); }
     public bool TagsOpen { get => _tagsOpen; set => Set(ref _tagsOpen, value); }
     public bool DeleteOpen { get => _deleteOpen; set => Set(ref _deleteOpen, value); }
@@ -196,7 +197,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         PauseCommand = new RelayCommand(() => { workspace.TogglePause(); });
         NewSnippetCommand = new RelayCommand(BeginNew, () => !IsEditing && !IsWorking && !workspace.Clipboard.IsLocked);
         EditCommand = new RelayCommand(BeginEdit, () => CanEdit);
-        CancelEditCommand = new RelayCommand(CancelEdit);
+        CancelEditCommand = new RelayCommand(RequestCancelEdit, () => !IsWorking);
         OpenSettingsCommand = new RelayCommand(() => { Settings.Load(workspace.Settings); ClosePopovers(); SettingsOpen = true; });
         CloseSettingsCommand = new RelayCommand(() => SettingsOpen = false);
         OpenTagsCommand = new RelayCommand(() => { if (!HasSelection) return; ClosePopovers(); TagInput = ""; TagsOpen = true; });
@@ -207,7 +208,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         QueueCommand = new RelayCommand(Enqueue, CanAct);
         ClearQueueCommand = new RelayCommand(() => { _queue.Clear(); QueueChanged(); }, () => !IsWorking);
         ShowMoreCommand = new RelayCommand(() => { _previewLength = Math.Min(PreviewSource().Length, _previewLength + 65_536); RefreshTextPreview(); });
-        OpenToolsCommand = new RelayCommand(() => { if (!CanTransform) return; ClosePopovers(); TransformReady = false; ToolsOpen = true; });
+        OpenToolsCommand = new RelayCommand(() => { if (!CanTransform) return; ClosePopovers(); TransformReady = false; ToolsOpen = true; }, () => CanTransform);
         OpenHelpCommand = new RelayCommand(() => { ClosePopovers(); HelpOpen = true; });
         OpenPaletteCommand = new RelayCommand(() => { ClosePopovers(); CommandSearch = ""; RefreshPalette(); PaletteOpen = true; });
         ClearSearchCommand = new RelayCommand(() => SearchText = "");
@@ -231,7 +232,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         PermanentDeleteCommand = Async(PermanentDeleteAsync, () => _pendingDeleteIds.Length > 0 && !IsWorking && !IsEditing && !workspace.Clipboard.IsLocked);
         UndoDeleteCommand = Async(UndoDeleteAsync, CanUndoDelete);
         ForgetDeletionCommand = Async(ForgetDeletionAsync, CanUndoDelete);
-        QueueNextCommand = Async(PasteNextAsync, () => HasQueue && !IsWorking && !IsEditing);
+        QueueNextCommand = Async(PasteNextAsync, CanUseQueue);
         ExtractTextCommand = Async(ExtractTextAsync, () => HasImage && !IsWorking && !IsEditing);
         SaveFileCommand = Async(SaveFileAsync, () => _loaded is not null && !IsWorking && !IsEditing);
         TransformCommand = Async(PreviewTransformAsync, () => CanTransform && SelectedTransform is not null);
@@ -242,10 +243,11 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         RecompareCommand = Async(RecompareAsync, () => CompareOpen && !IsWorking && _compareLeftSource is not null && _compareRightSource is not null);
         CopyDiffCommand = Async(CopyDiffAsync, () => CompareOpen && !IsWorking && !string.IsNullOrEmpty(CompareText));
         SaveDiffCommand = Async(SaveDiffAsync, () => CompareOpen && !IsWorking && !string.IsNullOrEmpty(CompareText));
+        InitializeWorkspaceCommands();
         _allPaletteItems =
         [
             new("New snippet", "Ctrl N", NewSnippetCommand), new("Pause / resume capture", "", PauseCommand),
-            new("Copy selected clips", "Ctrl C", CopyCommand), new("Paste as plain text", "Shift Enter", PlainPasteCommand),
+            new("Rename clip", "F2", RenameCommand), new("Review paste queue", "", ToggleQueueCommand), new("Search tips", "", OpenSearchHelpCommand), new("Copy selected clips", "Ctrl C", CopyCommand), new("Paste as plain text", "Shift Enter", PlainPasteCommand),
             new("Paste selection as file", "", PasteAsFileCommand), new("Compare two clips", "Ctrl D", CompareCommand),
             new("Toggle plain-text rule for paste target", "", TogglePlainTargetCommand),
             new("Undo last deletion", "Ctrl Z", UndoDeleteCommand), new("Queue selection", "Ctrl Q", QueueCommand), new("Transform text", "", OpenToolsCommand),
@@ -300,16 +302,17 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     private void RefreshCommands()
     {
         foreach (var command in _asyncCommands) command.Refresh();
-        EditCommand?.Refresh(); NewSnippetCommand?.Refresh(); QueueCommand?.Refresh(); ClearQueueCommand?.Refresh(); RemoveTagCommand?.Refresh(); RequestSourceDeleteCommand?.Refresh();
+        EditCommand?.Refresh(); NewSnippetCommand?.Refresh(); QueueCommand?.Refresh(); ClearQueueCommand?.Refresh(); RemoveTagCommand?.Refresh(); RequestSourceDeleteCommand?.Refresh(); OpenToolsCommand?.Refresh();
+        RefreshWorkspaceCommands();
         Raise(nameof(CanEdit)); Raise(nameof(CanTransform));
     }
     private void SetFilter(string key)
     {
-        _filterKey = key;
+        _filterKey = Filters.Any(filter => filter.Key == key) ? key : "all";
         foreach (var filter in Filters) filter.IsActive = filter.Key == key;
-        Raise(nameof(FilterLabel)); RaiseEmptyState(); Search();
+        Raise(nameof(FilterLabel)); Raise(nameof(ActiveFilter)); RaiseEmptyState(); Search();
     }
-    private void OnHistoryChanged() { if (!_disposed) _dispatcher.BeginInvoke(() => { RefreshDeletion(); Search(); }); }
+    private void OnHistoryChanged() { if (!_disposed) _dispatcher.BeginInvoke(() => { RefreshDeletion(); RefreshQueueItems(); Search(); }); }
     private void OnNotice(string message) { if (!_disposed) _dispatcher.BeginInvoke(() => Notify(message)); }
     private void OnCaptureState()
     {
@@ -333,18 +336,19 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
             var query = SearchQuery.Parse(SearchText) with { DeepSearch = DeepSearch };
             query = _filterKey switch
             {
-                "pinned" => query with { PinnedOnly = true }, "favorites" => query with { FavoritesOnly = true },
+                "pinned" => query with { PinnedOnly = true }, "snippets" => query with { SnippetsOnly = true }, "favorites" => query with { FavoritesOnly = true },
                 "image" => query with { Kind = ClipKind.Image }, "link" => query with { Kind = ClipKind.Link },
                 "files" => query with { Kind = ClipKind.Files }, _ => query
             };
-            var found = await Task.Run(() => _workspace.History.SearchAsync(query, token), token);
+            var sort = SelectedSort.Sort;
+            var found = await Task.Run(() => _workspace.History.SearchAsync(query, token, sort), token);
             token.ThrowIfCancellationRequested();
             if (_filterKey == "text") found = found.Where(e => e.Kind is ClipKind.Text or ClipKind.Code or ClipKind.Json or ClipKind.Color).ToArray();
             Reconcile(found);
             var snapshot = _workspace.History.Snapshot;
             foreach (var filter in Filters) filter.Count = filter.Key switch
             {
-                "pinned" => snapshot.Count(e => e.IsPinned), "favorites" => snapshot.Count(e => e.IsFavorite),
+                "pinned" => snapshot.Count(e => e.IsPinned), "snippets" => snapshot.Count(SearchMatcher.IsSnippet), "favorites" => snapshot.Count(e => e.IsFavorite),
                 "image" => snapshot.Count(e => e.Kind == ClipKind.Image), "link" => snapshot.Count(e => e.Kind == ClipKind.Link),
                 "files" => snapshot.Count(e => e.Kind == ClipKind.Files), "text" => snapshot.Count(e => e.Kind is ClipKind.Text or ClipKind.Code or ClipKind.Json or ClipKind.Color), _ => snapshot.Count
             };
@@ -465,14 +469,14 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     }
     private void BeginNew()
     {
-        ClosePopovers(); _editingId = null; EditText = ""; IsEditing = true; EditorFocusRequested?.Invoke();
+        ClosePopovers(); _editingId = null; _editOriginal = ""; EditText = ""; IsEditing = true; EditorFocusRequested?.Invoke();
     }
     private void BeginEdit()
     {
         if (!CanEdit) return;
-        ClosePopovers(); _editingId = SelectedItem!.Id; EditText = _loaded!.Text!; IsEditing = true; EditorFocusRequested?.Invoke();
+        ClosePopovers(); _editingId = SelectedItem!.Id; _editOriginal = _loaded!.Text!; EditText = _editOriginal; IsEditing = true; EditorFocusRequested?.Invoke();
     }
-    private void CancelEdit() { IsEditing = false; EditText = ""; _editingId = null; }
+    private void CancelEdit() { DiscardEditOpen = false; IsEditing = false; EditText = ""; _editingId = null; _editOriginal = ""; }
     private async Task SaveEditAsync()
     {
         IsWorking = true;
@@ -521,40 +525,6 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
             Notify($"Deleted {count} clips. Undo is available for ten minutes. The system clipboard is unchanged.");
         }
         finally { IsWorking = false; RefreshDeletion(); }
-    }
-    private void Enqueue()
-    {
-        var ids = SelectedIds();
-        if (_queue.Count + ids.Length > Limits.MaxItems)
-        {
-            Notify($"The queue holds up to {Limits.MaxItems:N0} clips. Paste or clear queued items before adding more.");
-            return;
-        }
-        foreach (var id in ids) _queue.Enqueue(id);
-        QueueChanged();
-        Notify($"{ids.Length} added to the queue, top to bottom. Use Ctrl+Alt+N in the target app.");
-    }
-    private void QueueChanged() { Raise(nameof(QueueLabel)); Raise(nameof(HasQueue)); RefreshCommands(); }
-    private async Task PasteNextAsync()
-    {
-        if (!_queue.TryPeek(out var id)) return;
-        var target = _target;
-        IsWorking = true;
-        try
-        {
-            ClipPayload payload;
-            try { payload = await Task.Run(() => _workspace.History.LoadAsync(id)); }
-            catch (KeyNotFoundException) { if (_queue.TryPeek(out var missing) && missing == id) _queue.Dequeue(); QueueChanged(); Notify("A deleted queue item was skipped. Press the shortcut again for the next item."); ShowRequested?.Invoke(); return; }
-            var forcePlain = ShouldForcePlain(target, [id]);
-            if (forcePlain) payload = new ClipPayload { Text = payload.GetPlainText() };
-            var result = await _workspace.Paste.PasteAsync(payload, target, _workspace.Settings.PreventCloudAndSystemHistory, () => HideRequested?.Invoke());
-            if (result.InputSent) { if (_queue.TryPeek(out var current) && current == id) _queue.Dequeue(); QueueChanged(); }
-            else ShowRequested?.Invoke();
-            Notify(result.InputSent
-                ? $"Paste sent. {_queue.Count} remaining in queue." + (forcePlain ? $" Plain-text rule applied for {target!.AppName}." : "")
-                : result.Message + " The item remains queued.");
-        }
-        finally { IsWorking = false; }
     }
     private async Task ExtractTextAsync()
     {
@@ -664,12 +634,16 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         PaletteItems.Clear();
         foreach (var item in _allPaletteItems.Where(p => p.Label.Contains(CommandSearch, StringComparison.OrdinalIgnoreCase))) PaletteItems.Add(item);
     }
-    public void ExecutePalette(PaletteAction action) { PaletteOpen = false; if (action.Command.CanExecute(null)) action.Command.Execute(null); }
+    public void ExecutePalette(PaletteAction action)
+    {
+        if (!action.Command.CanExecute(null)) { Notify("This action is unavailable for the current selection."); return; }
+        PaletteOpen = false; action.Command.Execute(null);
+    }
     public void FocusSearch() => SearchFocusRequested?.Invoke();
     public bool ClosePopovers()
     {
-        var wasOpen = TagsOpen || DeleteOpen || ToolsOpen || HelpOpen || PaletteOpen || CompareOpen;
-        TagsOpen = DeleteOpen = ToolsOpen = HelpOpen = PaletteOpen = CompareOpen = false;
+        var wasOpen = TagsOpen || DeleteOpen || ToolsOpen || HelpOpen || PaletteOpen || CompareOpen || RenameOpen || SearchHelpOpen || DiscardEditOpen;
+        TagsOpen = DeleteOpen = ToolsOpen = HelpOpen = PaletteOpen = CompareOpen = RenameOpen = SearchHelpOpen = DiscardEditOpen = false;
         return wasOpen;
     }
     public void OnSessionLock()

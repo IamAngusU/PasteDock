@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 — 2026-10-19
+
+- Replaced the queue counter with an editable queue: ordered entries, individual removal, move controls, separate tickets for duplicate clips and Copy & advance. Failed operations retain the head.
+- Added durable custom clip names and F2 rename, with validation and recognizable-secret filtering.
+- Added a protected snippet library. Snippet identity survives re-copy, editing and backup import; snippets are protected from automatic retention.
+- Added negative terms/phrases/apps/tags/types/flags, literal quoted operators, correct full-payload negative matching and five deterministic sort orders.
+- Kept filters reachable in compact layouts; saved sort and wrap preferences with window settings.
+- Added real CSS color inspection, preview wrapping, direct text/queue/export actions, a full-width error banner and explicit draft-discard review.
+- Added arrow navigation and availability handling to the command palette, themed both scrollbar directions and waited for quick-paste number keys to be released.
+- Expanded local verification to 167 core tests, 25 WPF scenario groups, 16 Python tests and the existing native/paste-coordinator checks.
+- Kept the runtime local and dependency-free. Unsigned x64 and cross-compiled ARM64 preview packages include source provenance and validation reports.
+
+
 ## 0.4.0 — 2026-10-19
 
 - Reworked the native workspace with a violet identity, consistent executable/tray icon, readable icon buttons, corrected dark-mode contrast and actionable first-use, paused and no-results states.

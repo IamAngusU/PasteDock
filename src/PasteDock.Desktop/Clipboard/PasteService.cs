@@ -92,7 +92,7 @@ internal sealed class NativePasteDesktop : IPasteDesktop
     public IntPtr GetForegroundWindow() => NativeMethods.GetForegroundWindow();
     public bool IsInteractiveDesktop() => NativeMethods.IsInteractiveDesktop();
     public uint GetClipboardSequenceNumber() => NativeMethods.GetClipboardSequenceNumber();
-    public bool KeysHeld() => new[] { 0x10, 0x11, 0x12, 0x5B, 0x5C, 0x0D, 0x56, 0x4E }
+    public bool KeysHeld() => new[] { 0x10, 0x11, 0x12, 0x5B, 0x5C, 0x0D, 0x56, 0x4E, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39 }
         .Any(key => (NativeMethods.GetAsyncKeyState(key) & 0x8000) != 0);
     public uint SendPaste()
     {

@@ -27,6 +27,7 @@ public static partial class ClipFactory
             Preview = Truncate(searchable, Limits.PreviewCharacters),
             SearchText = Truncate(searchable, Limits.SearchCharacters),
             SourceApp = Truncate(sourceApp, 100),
+            IsSnippet = sourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
             CreatedAt = now,
             LastCopiedAt = now,
             ByteCount = payload.GetByteCount(),

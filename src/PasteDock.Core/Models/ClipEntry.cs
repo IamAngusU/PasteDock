@@ -7,6 +7,8 @@ public sealed record ClipEntry
     public Guid BlobId { get; init; } = Guid.NewGuid();
     public ClipKind Kind { get; init; }
     public string Title { get; init; } = "Untitled";
+    public bool HasCustomTitle { get; init; }
+    public bool IsSnippet { get; init; }
     public string Preview { get; init; } = "";
     public string SearchText { get; init; } = "";
     public string SourceApp { get; init; } = "Unknown";
@@ -22,5 +24,5 @@ public sealed record ClipEntry
     public int ImageWidth { get; init; }
     public int ImageHeight { get; init; }
     public bool HasOcr { get; init; }
-    public bool IsProtected => IsPinned || IsFavorite;
+    public bool IsProtected => IsPinned || IsFavorite || IsSnippet || string.Equals(SourceApp, "PasteDock", StringComparison.OrdinalIgnoreCase);
 }

@@ -39,7 +39,7 @@ internal static class UiSmokeDiagnostics
             // Deliberately do not call WorkspaceService.InitializeAsync: it starts clipboard monitoring.
             await workspace.History.InitializeAsync();
             var settings = new AppSettings { RetentionDays = 0, ReducedMotion = true };
-            var json = await workspace.History.CaptureAsync(new ClipPayload { Text = "{\n  \"project\": \"PasteDock\",\n  \"mode\": \"local-first\"\n}" }, "Visual Studio", settings);
+            var json = await workspace.History.CaptureAsync(new ClipPayload { Text = "{\n  \"workspace\": \"Release review\",\n  \"capture\": {\n    \"mode\": \"local\",\n    \"exclude_private\": true\n  },\n  \"preview\": {\n    \"wrap\": true,\n    \"preserve_original\": true\n  },\n  \"queue\": [\n    \"Review the order\",\n    \"Paste one clip at a time\"\n  ],\n  \"shortcuts\": {\n    \"open\": \"Ctrl+Alt+V\",\n    \"rename\": \"F2\"\n  }\n}" }, "Visual Studio", settings);
             await workspace.History.UpdateMetadataAsync([json.Id], e => e with { IsPinned = true, Tags = ["development", "project"] });
             await workspace.History.CaptureAsync(new ClipPayload { Text = "https://example.test/reference" }, "Browser", settings);
             await workspace.History.CaptureAsync(new ClipPayload { Text = "A place for the things you copy.\nSearch, inspect, edit, and use them again." }, "Notes", settings);
@@ -57,6 +57,49 @@ internal static class UiSmokeDiagnostics
             if (window.FindName("HistoryList") is not ListBox { Items.Count: 4 })
                 throw new InvalidOperationException("The real history view did not bind to all four fixture clips.");
             checks.Add(new { name = "History list data binding", status = "passed" });
+            var historyView = (ListBox)window.FindName("HistoryList");
+            shell.RenameCommand.Execute(null); shell.RenameText = "";
+            shell.SaveRenameCommand.Execute(null); await WaitCommandAsync(shell.SaveRenameCommand);
+            if (!shell.RenameOpen || !shell.HasError) throw new InvalidOperationException("An invalid name must keep rename open.");
+            shell.RenameText = "Release configuration";
+            shell.SaveRenameCommand.Execute(null); await WaitCommandAsync(shell.SaveRenameCommand); await SettleAsync(shell);
+            if (shell.SelectedTitle != "Release configuration" || !workspace.History.Snapshot.Single(e => e.Id == json.Id).HasCustomTitle)
+                throw new InvalidOperationException("Renaming did not update the actual clip.");
+            checks.Add(new { name = "Rename validation and durable custom clip name", status = "passed" });
+
+            var snippet = await workspace.History.CaptureAsync(new ClipPayload { Text = "Before sharing a build:\n\nCheck the full clip. Review the queue. Keep the original.\n\nCtrl+Alt+V opens the workspace. Shift+Enter pastes plain text." }, "PasteDock", settings);
+            await workspace.History.RenameAsync(snippet.Id, "Release handoff notes");
+            var code = await workspace.History.CaptureAsync(new ClipPayload { Text = "async function retry(operation, attempts = 3) {\n  for (let attempt = 1; attempt <= attempts; attempt++) {\n    try {\n      return await operation();\n    } catch (error) {\n      if (attempt === attempts) throw error;\n      await new Promise(resolve => setTimeout(resolve, 250));\n    }\n  }\n}" }, "Code", settings);
+            await workspace.History.RenameAsync(code.Id, "Retry a local operation");
+            var imageBytes = FixtureImage();
+            var image = await workspace.History.CaptureAsync(new ClipPayload { Png = imageBytes, ImageWidth = 160, ImageHeight = 96 }, "Design", settings);
+            await workspace.History.RenameAsync(image.Id, "Violet palette study"); await SettleAsync(shell);
+            historyView.SelectedItems.Clear();
+            foreach (var item in shell.Items.Take(3)) historyView.SelectedItems.Add(item);
+            shell.SetSelection(historyView.SelectedItems.Cast<ClipItemViewModel>().ToArray());
+            shell.QueueCommand.Execute(null);
+            var firstTicket = shell.QueueItems[0].Ticket; var lastTicket = shell.QueueItems[^1].Ticket;
+            shell.SelectedQueueItem = shell.QueueItems[^1]; shell.QueueUpCommand.Execute(null);
+            if (shell.QueueItems[1].Ticket != lastTicket || shell.QueueItems[0].Ticket != firstTicket)
+                throw new InvalidOperationException("Queue reordering lost an item or moved the wrong ticket.");
+            shell.QueueDownCommand.Execute(null); shell.QueueRemoveCommand.Execute(null);
+            if (shell.QueueItems.Count != 2) throw new InvalidOperationException("Queue removal did not remove exactly one entry.");
+            shell.CopyQueueNextCommand.Execute(null); await WaitCommandAsync(shell.CopyQueueNextCommand);
+            if (!shell.HasError || shell.QueueItems.Count != 2 || shell.QueueItems[0].Ticket != firstTicket)
+                throw new InvalidOperationException("A failed copy advanced the queue.");
+            await CaptureAsync(window, Path.Combine(output, "light-queue-copy-recovery.png"));
+            shell.DismissErrorCommand.Execute(null);
+            historyView.SelectedItems.Clear(); historyView.SelectedItem = shell.Items.Single(e => e.Id == code.Id);
+            shell.SetSelection([shell.Items.Single(e => e.Id == code.Id)]); shell.QueueCommand.Execute(null);
+            historyView.SelectedItems.Clear(); historyView.SelectedItem = shell.Items.Single(e => e.Id == json.Id);
+            shell.SetSelection([shell.Items.Single(e => e.Id == json.Id)]); await SettleAsync(shell);
+            checks.Add(new { name = "Editable queue and failed copy retain exact tickets", status = "passed" });
+            window.UpdateLayout();
+            var historyScroll = FindVisual<ScrollViewer>(historyView) ?? throw new InvalidOperationException("History scroll viewer is missing.");
+            historyScroll.ScrollToBottom(); await SettleAsync(shell);
+            if (historyScroll.VerticalOffset <= 0) throw new InvalidOperationException("The themed history scrollbar cannot scroll its content.");
+            historyScroll.ScrollToTop(); await SettleAsync(shell);
+            checks.Add(new { name = "Themed scrollbar moves virtualized history", status = "passed" });
             foreach (var theme in new[] { "Light", "Dark" })
             {
                 ThemeService.Apply(theme);
@@ -69,11 +112,72 @@ internal static class UiSmokeDiagnostics
                 checks.Add(new { name = theme + " workspace and settings rendered", status = "passed" });
             }
             ThemeService.Apply("Light");
+            shell.ClearQueueCommand.Execute(null);
+            historyView.SelectedItem = shell.Items.Single(e => e.Id == image.Id); await SettleAsync(shell);
+            if (!shell.ShowImage || shell.PreviewImage is null || !(await workspace.History.LoadAsync(image.Id)).Png!.AsSpan().SequenceEqual(imageBytes))
+                throw new InvalidOperationException("Image inspection changed or failed to load the original PNG.");
+            await CaptureAsync(window, Path.Combine(output, "light-image-inspector.png"));
+            historyView.SelectedItem = shell.Items.Single(e => e.Entry.Kind == ClipKind.Color); await SettleAsync(shell);
+            if (!shell.ShowColor || shell.ShowText || shell.ColorPreview is not SolidColorBrush { Color.R: 0x31, Color.G: 0x5D, Color.B: 0x4A })
+                throw new InvalidOperationException("Color inspection does not show the original RGB value.");
+            await CaptureAsync(window, Path.Combine(output, "light-color-inspector.png"));
+            checks.Add(new { name = "Real image and CSS color inspectors", status = "passed" });
+
+            var longClip = await workspace.History.CaptureAsync(new ClipPayload { Text = new string('W', 250) + "\nSecond line" }, "Notes", settings);
+            await SettleAsync(shell); historyView.SelectedItem = shell.Items.Single(e => e.Id == longClip.Id); await SettleAsync(shell);
+            var textPreview = (TextBox)window.FindName("PreviewTextBox");
+            shell.WrapText = true; await SettleAsync(shell);
+            if (textPreview.LineCount <= 2) throw new InvalidOperationException("Long preview lines did not wrap.");
+            shell.WrapText = false; await SettleAsync(shell); textPreview.ScrollToHorizontalOffset(120); await SettleAsync(shell);
+            if (textPreview.LineCount != 2 || textPreview.HorizontalOffset <= 0) throw new InvalidOperationException("Unwrapped preview cannot scroll horizontally.");
+            shell.WrapText = true; await workspace.History.DeleteAsync([longClip.Id]); await SettleAsync(shell);
+            checks.Add(new { name = "Wrapped and horizontal-scrolling text previews", status = "passed" });
+
+            var notePayload = await workspace.History.LoadAsync(snippet.Id);
+            for (var repeat = 0; repeat < 3; repeat++) await workspace.History.CaptureAsync(notePayload, "Notes", settings);
+            await SettleAsync(shell);
+            shell.FilterCommand.Execute("snippets"); await SettleAsync(shell);
+            if (shell.Items.Count != 1 || shell.Items[0].Id != snippet.Id)
+                throw new InvalidOperationException("A re-copied snippet disappeared from My snippets.");
+            shell.ResetViewCommand.Execute(null); shell.SelectedSort = shell.SortOptions.Single(e => e.Sort == PasteDock.Core.Search.SearchSort.MostCopied);
+            await SettleAsync(shell);
+            if (shell.Items[0].Id != json.Id || shell.Items[1].Id != snippet.Id)
+                throw new InvalidOperationException("Most-copied sorting did not keep pins first and rank counts.");
+            shell.WrapText = false;
+            var preferences = window.WithCurrentGeometry(workspace.Settings);
+            await workspace.Store.SaveSettingsAsync(preferences);
+            var reloadedSettings = await workspace.Store.LoadSettingsAsync();
+            if (reloadedSettings.PreviewWrap || reloadedSettings.HistorySort != PasteDock.Core.Search.SearchSort.MostCopied)
+                throw new InvalidOperationException("View preferences did not survive encrypted settings storage.");
+            shell.WrapText = true; shell.SelectedSort = shell.SortOptions[0]; await SettleAsync(shell);
+            checks.Add(new { name = "Snippet identity sorting and saved view preferences", status = "passed" });
+
+            shell.OpenSearchHelpCommand.Execute(null); await SettleAsync(shell);
+            if (window.FindName("SearchHelpPopup") is not System.Windows.Controls.Primitives.Popup { IsOpen: true, Child: FrameworkElement searchHelp })
+                throw new InvalidOperationException("Search help did not render.");
+            await CaptureElementAsync(searchHelp, Path.Combine(output, "light-search-help.png")); shell.SearchHelpOpen = false;
+            shell.SearchText = "-app:Code -type:image"; await SettleAsync(shell);
+            if (shell.Items.Any(e => e.Id == code.Id || e.Id == image.Id)) throw new InvalidOperationException("Search exclusion filters were not applied.");
+            shell.ResetViewCommand.Execute(null); await SettleAsync(shell);
+            checks.Add(new { name = "Search exclusions and discoverable operator help", status = "passed" });
+            historyView.SelectedItems.Clear();
+            foreach (var item in shell.Items.Take(2)) historyView.SelectedItems.Add(item);
+            shell.SetSelection(historyView.SelectedItems.Cast<ClipItemViewModel>().ToArray());
+            shell.OpenPaletteCommand.Execute(null); shell.CommandSearch = "Rename clip"; await SettleAsync(shell);
+            var renameAction = shell.PaletteItems.Single();
+            shell.ExecutePalette(renameAction);
+            if (!shell.PaletteOpen || shell.RenameOpen) throw new InvalidOperationException("An unavailable palette action closed the menu or ran anyway.");
+            historyView.SelectedItems.Clear(); historyView.SelectedItem = shell.Items.Single(e => e.Id == json.Id);
+            shell.SetSelection([shell.Items.Single(e => e.Id == json.Id)]);
+            shell.ExecutePalette(renameAction); await SettleAsync(shell);
+            if (shell.PaletteOpen || !shell.RenameOpen) throw new InvalidOperationException("The selected palette action did not open rename.");
+            shell.CancelRenameCommand.Execute(null);
+            checks.Add(new { name = "Command palette respects action availability and selection", status = "passed" });
+
             if (window.FindName("HistoryList") is not ListBox history || history.Items.Count < 2)
                 throw new InvalidOperationException("The history fixture cannot prepare a two-clip comparison.");
             history.SelectedItems.Clear();
-            history.SelectedItems.Add(history.Items[0]);
-            history.SelectedItems.Add(history.Items[1]);
+            foreach (var item in shell.Items.Where(e => e.Entry.Kind is not (ClipKind.Image or ClipKind.Files)).Take(2)) history.SelectedItems.Add(item);
             shell.SetSelection(history.SelectedItems.Cast<ClipItemViewModel>().ToArray());
             shell.CompareCommand.Execute(null);
             await WaitCommandAsync(shell.CompareCommand);
@@ -93,8 +197,19 @@ internal static class UiSmokeDiagnostics
             shell.EditText = "A synthetic draft. No private clipboard content is used by this check.";
             await SettleAsync(shell);
             await CaptureAsync(window, Path.Combine(output, "light-inline-editor.png"));
-            shell.CancelEditCommand.Execute(null);
+            shell.DiscardEditCommand.Execute(null);
             checks.Add(new { name = "Inline editor rendered", status = "passed" });
+
+            shell.NewSnippetCommand.Execute(null); shell.EditText = "A draft that should not disappear after Escape.";
+            shell.CancelEditCommand.Execute(null);
+            if (!shell.IsEditing || !shell.DiscardEditOpen) throw new InvalidOperationException("Cancel discarded a modified draft without review.");
+            await CaptureAsync(window, Path.Combine(output, "light-draft-discard-review.png"));
+            shell.KeepEditingCommand.Execute(null);
+            if (shell.DiscardEditOpen || shell.EditText != "A draft that should not disappear after Escape.")
+                throw new InvalidOperationException("Keep editing lost the draft.");
+            shell.CancelEditCommand.Execute(null); shell.DiscardEditCommand.Execute(null);
+            if (shell.IsEditing) throw new InvalidOperationException("Explicit draft discard did not close the editor.");
+            checks.Add(new { name = "Draft discard review preserves work until explicit discard", status = "passed" });
 
             // Exercise recovery paths using only this isolated synthetic workspace.
             shell.NewSnippetCommand.Execute(null);
@@ -111,7 +226,7 @@ internal static class UiSmokeDiagnostics
             window.HidePanel(); window.Show();
             if (!shell.IsEditing || shell.EditText != "A draft survives hiding the workspace.")
                 throw new InvalidOperationException("Hiding the workspace lost the draft.");
-            shell.CancelEditCommand.Execute(null);
+            shell.DiscardEditCommand.Execute(null);
             checks.Add(new { name = "Draft survives hide and reopen", status = "passed" });
 
             shell.OpenSettingsCommand.Execute(null);
@@ -153,6 +268,7 @@ internal static class UiSmokeDiagnostics
             checks.Add(new { name = "Deleted queued clip skipped without clipboard access", status = "passed" });
 
             window.MinWidth = 620; window.Width = 720; window.Height = 560; await SettleAsync(shell);
+            ((ColumnDefinition)window.FindName("HistoryColumn")).Width = new GridLength(230); await SettleAsync(shell);
             await CaptureAsync(window, Path.Combine(output, "light-compact-workspace.png"));
             if (window.FindName("NavigationPane") is not FrameworkElement { Visibility: Visibility.Collapsed })
                 throw new InvalidOperationException("Compact workspace did not release navigation space.");
@@ -165,7 +281,7 @@ internal static class UiSmokeDiagnostics
                 || shell.NewSnippetCommand.CanExecute(null) || shell.HasQueue || shell.PreviewText.Length > 0
                 || shell.EditText != "Unsaved draft survives Windows lock.")
                 throw new InvalidOperationException("Session lock did not disable actions and clear preview while preserving the draft.");
-            workspace.SetSessionLocked(false); shell.CancelEditCommand.Execute(null); window.Show(); shell.OnShown(); await SettleAsync(shell);
+            workspace.SetSessionLocked(false); shell.DiscardEditCommand.Execute(null); window.Show(); shell.OnShown(); await SettleAsync(shell);
             checks.Add(new { name = "Session lock clears preview and disables paste while preserving draft", status = "passed" });
 
             await workspace.History.DeleteAsync(workspace.History.Snapshot.Select(e => e.Id).ToArray()); await SettleAsync(shell);
@@ -215,6 +331,30 @@ internal static class UiSmokeDiagnostics
             if (watch.Elapsed > TimeSpan.FromSeconds(10))
                 throw new TimeoutException("The synthetic workspace did not settle within the UI smoke deadline.");
         } while (shell.IsSearching || shell.PreviewBusy);
+    }
+
+    private static byte[] FixtureImage()
+    {
+        var pixels = new byte[160 * 96 * 4];
+        for (var y = 0; y < 96; y++) for (var x = 0; x < 160; x++)
+        {
+            var index = (y * 160 + x) * 4;
+            pixels[index] = (byte)(170 + x / 4); pixels[index + 1] = (byte)(55 + y); pixels[index + 2] = (byte)(70 + x / 3); pixels[index + 3] = 255;
+        }
+        var bitmap = BitmapSource.Create(160, 96, 96, 96, PixelFormats.Bgra32, null, pixels, 160 * 4);
+        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using var stream = new MemoryStream(); encoder.Save(stream); return stream.ToArray();
+    }
+
+    private static T? FindVisual<T>(DependencyObject root) where T : DependencyObject
+    {
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match) return match;
+            if (FindVisual<T>(child) is { } nested) return nested;
+        }
+        return null;
     }
 
     private static async Task WaitCommandAsync(AsyncRelayCommand command)

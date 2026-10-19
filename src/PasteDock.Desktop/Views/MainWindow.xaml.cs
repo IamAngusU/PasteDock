@@ -42,7 +42,17 @@ public partial class MainWindow : Window
         PaletteSearch.PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.Escape) { viewModel.PaletteOpen = false; e.Handled = true; }
-            else if (e.Key == Key.Enter && viewModel.PaletteItems.FirstOrDefault() is { } action)
+            else if (e.Key is Key.Down or Key.Up)
+            {
+                var direction = e.Key == Key.Down ? 1 : -1;
+                if (PaletteList.Items.Count > 0)
+                {
+                    PaletteList.SelectedIndex = Math.Clamp(PaletteList.SelectedIndex + direction, 0, PaletteList.Items.Count - 1);
+                    PaletteList.ScrollIntoView(PaletteList.SelectedItem);
+                }
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Enter && (PaletteList.SelectedItem as PaletteAction ?? viewModel.PaletteItems.FirstOrDefault()) is { } action)
             { viewModel.ExecutePalette(action); e.Handled = true; }
         };
     }
@@ -62,7 +72,8 @@ public partial class MainWindow : Window
     {
         WindowWidth = WindowState == WindowState.Normal ? ActualWidth : RestoreBounds.Width,
         WindowHeight = WindowState == WindowState.Normal ? ActualHeight : RestoreBounds.Height,
-        ListWidth = HistoryColumn.ActualWidth
+        ListWidth = HistoryColumn.ActualWidth,
+        HistorySort = _viewModel.SelectedSort.Sort, PreviewWrap = _viewModel.WrapText
     }).Normalize();
 
     internal void Reveal()
@@ -178,6 +189,8 @@ public partial class MainWindow : Window
         if (ctrl && key == Key.OemComma) { Run(_viewModel.OpenSettingsCommand); return; }
         if (ctrl && key == Key.OemQuestion) { Run(_viewModel.OpenHelpCommand); return; }
         if (_viewModel.SettingsOpen) return;
+        if (key == Key.F2 && modifiers == ModifierKeys.None && (focusedElement is not TextBoxBase and not PasswordBox || ReferenceEquals(focusedElement, SearchBox)))
+        { Run(_viewModel.RenameCommand); return; }
         if (ctrl && key == Key.F) { FocusSearch(); e.Handled = true; return; }
         if (ReferenceEquals(Keyboard.FocusedElement, SearchBox) && (key is Key.Down or Key.Up) && modifiers == ModifierKeys.None)
         {
@@ -256,12 +269,18 @@ public partial class MainWindow : Window
     private async void ImportBackup(object sender, RoutedEventArgs e) { var passphrase = BackupPassword.Password; BackupPassword.Clear(); await _viewModel.BackupAsync(true, passphrase); }
     private void MoreClick(object sender, RoutedEventArgs e) { _viewModel.ClosePopovers(); MorePopup.IsOpen = !MorePopup.IsOpen; }
     private void CloseMore(object sender, RoutedEventArgs e) => MorePopup.IsOpen = false;
-    private void PaletteOpened(object? sender, EventArgs e) => Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => PaletteSearch.Focus()));
+    private void PaletteOpened(object? sender, EventArgs e) => Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => { PaletteList.SelectedIndex = PaletteList.Items.Count > 0 ? 0 : -1; PaletteSearch.Focus(); }));
+    private void RenameOpened(object? sender, EventArgs e) => Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() => { RenameInput.Focus(); RenameInput.SelectAll(); }));
+    private void RenamePreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) { _viewModel.SaveRenameCommand.Execute(null); e.Handled = true; }
+        else if (e.Key == Key.Escape) { _viewModel.CancelRenameCommand.Execute(null); e.Handled = true; }
+    }
     private void PopoverPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape) { MorePopup.IsOpen = false; _viewModel.ClosePopovers(); e.Handled = true; }
         else if (e.Key == Key.Enter && ReferenceEquals(Keyboard.FocusedElement, TagInputBox))
         { _viewModel.AddTagsCommand.Execute(null); e.Handled = true; }
     }
-    private void PaletteActionClick(object sender, RoutedEventArgs e) { if (sender is FrameworkElement { DataContext: PaletteAction action }) _viewModel.ExecutePalette(action); }
+    private void PaletteActionClick(object sender, RoutedEventArgs e) => _viewModel.PaletteOpen = false;
 }

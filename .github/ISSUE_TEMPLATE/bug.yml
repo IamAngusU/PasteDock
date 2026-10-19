@@ -8,7 +8,7 @@ body:
     id: version
     attributes:
       label: PasteDock version and CPU architecture
-      placeholder: 0.4.0 / x64
+      placeholder: 0.5.0 / x64
     validations:
       required: true
   - type: input

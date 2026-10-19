@@ -1,5 +1,5 @@
 {
-  "timestampUtc": "2026-10-19T19:08:44.7334423+00:00",
+  "timestampUtc": "2026-10-19T19:57:48.9153853+00:00",
   "status": "passed",
   "validation": "Real WPF construction, data binding and off-screen rendering. Not a manual visual acceptance review.",
   "clipboardAccessed": false,
@@ -8,14 +8,19 @@
   "screenshots": [
     "dark-settings.png",
     "dark-workspace.png",
+    "light-color-inspector.png",
     "light-compact-workspace.png",
     "light-compare-popup.png",
     "light-deletion-undo.png",
+    "light-draft-discard-review.png",
     "light-first-use-paused.png",
     "light-first-use.png",
+    "light-image-inspector.png",
     "light-inline-editor.png",
     "light-invalid-settings.png",
     "light-no-results.png",
+    "light-queue-copy-recovery.png",
+    "light-search-help.png",
     "light-settings.png",
     "light-workspace.png"
   ],
@@ -26,11 +31,43 @@
       "status": "passed"
     },
     {
+      "name": "Rename validation and durable custom clip name",
+      "status": "passed"
+    },
+    {
+      "name": "Editable queue and failed copy retain exact tickets",
+      "status": "passed"
+    },
+    {
+      "name": "Themed scrollbar moves virtualized history",
+      "status": "passed"
+    },
+    {
       "name": "Light workspace and settings rendered",
       "status": "passed"
     },
     {
       "name": "Dark workspace and settings rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Real image and CSS color inspectors",
+      "status": "passed"
+    },
+    {
+      "name": "Wrapped and horizontal-scrolling text previews",
+      "status": "passed"
+    },
+    {
+      "name": "Snippet identity sorting and saved view preferences",
+      "status": "passed"
+    },
+    {
+      "name": "Search exclusions and discoverable operator help",
+      "status": "passed"
+    },
+    {
+      "name": "Command palette respects action availability and selection",
       "status": "passed"
     },
     {
@@ -43,6 +80,10 @@
     },
     {
       "name": "Inline editor rendered",
+      "status": "passed"
+    },
+    {
+      "name": "Draft discard review preserves work until explicit discard",
       "status": "passed"
     },
     {

@@ -3,10 +3,10 @@
 <h1 align="center">A home for everything you copy.</h1>
 <p align="center">Find it. Fix it. Paste it again.<br>A private clipboard workspace built for Windows.</p>
 <p align="center">
-  <a href="https://github.com/IamAngusU/PasteDock/releases/tag/v0.4.0"><img src="docs/assets/badge-release.svg" height="40" alt="0.4.0 preview"></a>
+  <a href="https://github.com/IamAngusU/PasteDock/releases/tag/v0.5.0"><img src="docs/assets/badge-release.svg" height="40" alt="0.5.0 preview"></a>
   <a href="#get-started"><img src="docs/assets/badge-platforms.svg" height="40" alt="Windows x64 and ARM64"></a>
   <a href="#your-clipboard-stays-yours"><img src="docs/assets/badge-privacy.svg" height="40" alt="Local and encrypted"></a>
-  <a href="docs/RELEASE-VALIDATION.md"><img src="docs/assets/badge-tests.svg" height="40" alt="134 executed core regression tests"></a>
+  <a href="docs/RELEASE-VALIDATION.md"><img src="docs/assets/badge-tests.svg" height="40" alt="167 executed core regression tests"></a>
 </p>
 <p align="center"><a href="https://github.com/IamAngusU/PasteDock/actions/workflows/windows.yml"><img src="https://github.com/IamAngusU/PasteDock/actions/workflows/windows.yml/badge.svg" alt="Current GitHub validation status"></a></p>
 <p align="center"><a href="#get-started">Download</a> · <a href="#make-copied-things-useful">Features</a> · <a href="#your-clipboard-stays-yours">Privacy</a> · <a href="docs/RELEASE-VALIDATION.md">Test evidence</a> · <a href="CONTRIBUTING.md">Contribute</a></p>
@@ -14,9 +14,20 @@
 ![PasteDock's real WPF workspace](docs/assets/workspace-light.png)
 <sub>Actual Windows rendering with synthetic clips. Light and dark themes, keyboard navigation and a resizable inspector.</sub>
 
+## A smoother everyday workflow in 0.5
+
+Give clips useful names with **F2**. Names survive edits, repeat copies and encrypted backups. **My snippets** keeps your own notes together; saved snippets are protected from automatic retention.
+
+Review the **paste queue** before using it: reorder entries, remove one, or use **Copy & advance** for manual paste. Repeated clips keep separate positions. Failed copies and uncertain automatic pastes keep their queue entry.
+
+Find more with less typing: exclude a word, phrase, source app, tag or type. Choose **Best match**, **Recently copied**, **Most copied**, **Newest saved** or **Largest first**. Pinned clips stay first. Deep mode checks exclusions against the whole payload.
+
+Errors now have a visible, wrapping recovery message. Cancelling a modified draft asks you to keep editing or explicitly discard it. Color inspection shows the CSS value, text can wrap, and the command menu supports arrow navigation. Sort and text-wrap choices are saved with your window preferences.
+
+[Everyday workflows and search examples](docs/WORKFLOWS.md)
 ## Get started
 
-1. Download **PasteDock-0.4.0-win-x64.zip** from the [0.4.0 preview release](https://github.com/IamAngusU/PasteDock/releases/tag/v0.4.0). Use the ARM64 archive on a Windows ARM device.
+1. Download **PasteDock-0.5.0-win-x64.zip** from the [0.5.0 preview release](https://github.com/IamAngusU/PasteDock/releases/tag/v0.5.0). Use the ARM64 archive on a Windows ARM device.
 2. Extract the entire folder and run **PasteDock.exe**. The self-contained build includes its .NET runtime. No administrator account or sign-in is needed.
 3. Copy something in another app. Press **Ctrl+Alt+V** to find it, then **Enter** to paste. **Shift+Enter** pastes plain text.
 
@@ -71,7 +82,7 @@ Clipboard content stays in `%LOCALAPPDATA%\PasteDock`, encrypted with current-us
 
 DPAPI does not protect against another program running as the same Windows user. Secret detection cannot recognize every password. File clips are references, so moving or deleting the original makes them unavailable. Exports and temporary paste files are ordinary local files. Portable backups use a separate passphrase. [Full privacy model](docs/SECURITY.md).
 
-Defaults: 2,000 clips, 30 days for unprotected history, 512 MiB of logical content. Pins and favorites are protected from retention. Individual clips are limited to 64 MiB; images to 40 million pixels. Oversized copies are skipped explicitly. Backups are limited to 128 MiB of raw content. [Detailed reference](docs/USER-GUIDE.de.md).
+Defaults: 2,000 clips, 30 days for unprotected history, 512 MiB of logical content. Pins, favorites and saved snippets are protected from automatic retention. Individual clips are limited to 64 MiB; images to 40 million pixels. Oversized copies are skipped explicitly. Backups are limited to 128 MiB of raw content. [Detailed reference](docs/USER-GUIDE.de.md).
 
 ## A native app, a small stack
 
