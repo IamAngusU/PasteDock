@@ -2,6 +2,8 @@
 
 Executed on **19 October 2026**, on Windows x64 with .NET SDK **10.0.401**. These are release checks by the maintainer, not an independent audit. GitHub Actions repeats core tests on Linux and builds Windows x64/ARM64; its live result is separate from this local snapshot.
 
+**Hosted CI has not executed this release.** The initial push and a manual dispatch both stopped before job creation with `startup_failure`; no runner, steps or hosted test results were produced. The workflow passes `actionlint 1.7.7` locally. This release is backed by the executed local reports below, not by a green GitHub Actions run. Once account execution is available, dispatch `windows.yml` again to obtain hosted Linux and Windows evidence.
+
 - **134/134 core regression tests passed.** Storage transactions, tampering, quota refusal, cancellation, undo durability, backup authentication, import atomicity, search, transforms, bounded diff and missing file references. [Executed JSON](validation/core-windows-x64.json).
 - **16/16 Python tooling tests passed.** Includes a Windows text-decoding fix in the source checker. The static validator and 14-item feature-presence audit also passed. Static checks alone do not establish runtime correctness.
 - **Windows solution build passed with zero warnings and zero errors.** WPF's manifest owns per-monitor DPI; the WinForms-only DPI analyzer is explicitly suppressed because WinForms is used for tray and monitor bounds.
