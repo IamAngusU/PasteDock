@@ -3,30 +3,32 @@
 <h1 align="center">Ein Zuhause für alles, was du kopierst.</h1>
 <p align="center">Wiederfinden. Bearbeiten. Weiterverwenden.<br>Dein lokaler Clipboard-Workspace für Windows.</p>
 <p align="center">
-  <a href="https://github.com/IamAngusU/PasteDock/releases/tag/v0.5.0"><img src="docs/assets/badge-release.svg" height="40" alt="0.5.0 Preview"></a>
+  <a href="https://github.com/IamAngusU/PasteDock/releases/tag/v0.6.0"><img src="docs/assets/badge-release.svg" height="40" alt="0.6.0 Preview"></a>
   <a href="#loslegen"><img src="docs/assets/badge-platforms.svg" height="40" alt="Windows x64 und ARM64"></a>
   <a href="#deine-zwischenablage-bleibt-bei-dir"><img src="docs/assets/badge-privacy.svg" height="40" alt="Lokal und verschlüsselt"></a>
-  <a href="docs/RELEASE-VALIDATION.md"><img src="docs/assets/badge-tests.svg" height="40" alt="167 ausgeführte Core-Regressionstests"></a>
+  <a href="docs/RELEASE-VALIDATION.md"><img src="docs/assets/badge-tests.svg" height="40" alt="197 ausgeführte Core-Regressionstests"></a>
 </p>
 <p align="center"><a href="https://github.com/IamAngusU/PasteDock/actions/workflows/windows.yml"><img src="https://github.com/IamAngusU/PasteDock/actions/workflows/windows.yml/badge.svg" alt="Aktueller GitHub-CI-Status"></a></p>
 
 ![Die echte WPF-Oberfläche von PasteDock](docs/assets/workspace-light.png)
 <sub>Echtes Windows-Rendering mit synthetischen Beispielen. Die App-Oberfläche ist Englisch; die README gibt es auf Deutsch und Englisch.</sub>
 
-## Neu in 0.5: ein besserer Arbeitsablauf
+## Neu in 0.6: zuverlässiger bearbeiten
 
-Mit **F2** gibst du Clips eigene Namen. Diese bleiben beim Bearbeiten, erneuten Kopieren und in verschlüsselten Backups erhalten. **My snippets** sammelt deine eigenen Notizen und schützt sie vor automatischer Retention.
+Ein unfertiger Text erhält nach einer Sekunde eine **verschlüsselte lokale Rettungskopie**. Nach einem Neustart kannst du ihn wiederherstellen oder ausdrücklich verwerfen. Der Editor zeigt, ob die Sicherung gelungen ist. Erkannte Geheimnisse, zu große Entwürfe und Speicherfehler werden klar gemeldet.
 
-Die **Paste-Queue** zeigt ihre Einträge und Reihenfolge. Du kannst umsortieren, einzelne Einträge entfernen oder mit **Copy & advance** bewusst kopieren und manuell einfügen. Fehlgeschlagene Kopien und unklare Paste-Ergebnisse lassen den Eintrag in der Queue.
+**Save as new** oder **Ctrl+Shift+Enter** erstellt ein separates Snippet und erhält das Original. Auch Varianten mit identischem Text behalten ihre eigenen Namen und Identitäten in Backup-Import und Löschrücknahme. Ein veralteter Editor kann einen inzwischen geänderten oder gelöschten Originalclip nicht überschreiben.
 
-Die Suche kann Wörter, Phrasen, Apps, Tags und Typen ausschließen. Dazu kommen fünf Sortierungen und direkt erreichbare Suchbeispiele. Deep prüft Ausschlüsse auch im vollständigen Inhalt. Filter bleiben in schmalen Fenstern bedienbar.
+Manuelles Speichern verdrängt keine anderen Clips, um Platz zu schaffen. Fehler lassen deinen Text im Editor. Das gespeicherte Snippet wird direkt ausgewählt. Umbruch, Zeichenzähler und Sicherungsstatus passen auch im dunklen und schmalen Fenster.
 
-Fehler erscheinen mit vollständig lesbarer Rückmeldung. Ein geänderter Entwurf wird beim Abbrechen erst nach deiner ausdrücklichen Auswahl verworfen. Es gibt eine CSS-Farbvorschau, Textumbruch und Pfeiltasten im Befehlsmenü. Sortierung und Umbruch werden mit den Fensterpräferenzen gespeichert.
+Die Entwurfsrettung lässt sich abschalten: ein Entwurf, bis zu 1.048.576 Zeichen, sieben Tage. Die aktuellen Datenschutzregeln gelten auch hier. Entwürfe sind von portablen Backups ausgeschlossen. Alles bleibt lokal.
+
+![Wiederhergestellter Entwurf im PasteDock-Editor](docs/assets/recovered-editor.png)
 
 [Workflows und Suchbeispiele](docs/WORKFLOWS.md)
 ## Loslegen
 
-1. **PasteDock-0.5.0-win-x64.zip** aus dem [Preview-Release](https://github.com/IamAngusU/PasteDock/releases/tag/v0.5.0) laden. Auf Windows-ARM-Geräten das ARM64-Archiv verwenden.
+1. **PasteDock-0.6.0-win-x64.zip** aus dem [Preview-Release](https://github.com/IamAngusU/PasteDock/releases/tag/v0.6.0) laden. Auf Windows-ARM-Geräten das ARM64-Archiv verwenden.
 2. Den gesamten Ordner entpacken und **PasteDock.exe** starten. Die .NET-Runtime ist enthalten. Kein Admin, kein Konto.
 3. In einer anderen App etwas kopieren. **Ctrl+Alt+V** öffnet PasteDock, **Enter** fügt ein. **Shift+Enter** fügt reinen Text ein.
 

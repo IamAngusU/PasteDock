@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 — 2026-10-20
+
+- Added bounded encrypted editor recovery: one-second autosave, seven-day expiry, current privacy checks, opt-out, explicit restore/discard and readable failure states. Drafts stay out of portable backups.
+- Added Save as new and Ctrl+Shift+Enter, payload revision checks and safe recovery when the original changed or disappeared. New snippets are selected directly.
+- Preserved intentional identical snippets through backup import, repeated imports and deletion undo using stable identities. Imports keep current versions of an existing snippet.
+- Prevented manual snippet saves from evicting unrelated history. Failed saves/discard retain text; failed recovery cleanup reports already committed history accurately.
+- Added editor wrapping, character counts and recovery status. Fixed disabled history backgrounds in dark mode and durable custom names through deletion undo.
+- Expanded verification to 197 core tests and 38 WPF scenario groups, alongside 16 Python tests and native/paste-coordinator checks. Builds remain unsigned previews.
+
 ## 0.5.0 — 2026-10-19
 
 - Replaced the queue counter with an editable queue: ordered entries, individual removal, move controls, separate tickets for duplicate clips and Copy & advance. Failed operations retain the head.

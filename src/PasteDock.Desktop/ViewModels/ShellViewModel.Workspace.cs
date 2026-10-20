@@ -61,7 +61,7 @@ internal sealed partial class ShellViewModel
     public RelayCommand QueueRemoveCommand { get; private set; } = null!;
     public AsyncRelayCommand CopyQueueNextCommand { get; private set; } = null!;
     public RelayCommand DismissErrorCommand { get; private set; } = null!;
-    public RelayCommand DiscardEditCommand { get; private set; } = null!;
+    public AsyncRelayCommand DiscardEditCommand { get; private set; } = null!;
     public RelayCommand KeepEditingCommand { get; private set; } = null!;
     private void InitializeWorkspaceCommands()
     {
@@ -88,7 +88,8 @@ internal sealed partial class ShellViewModel
         CopyQueueNextCommand = new AsyncRelayCommand(CopyQueueNextAsync, ReportError, CanUseQueue);
         _asyncCommands.Add(CopyQueueNextCommand);
         DismissErrorCommand = new RelayCommand(() => Notify("Ready."));
-        DiscardEditCommand = new RelayCommand(CancelEdit, () => !IsWorking);
+        DiscardEditCommand = new AsyncRelayCommand(DiscardEditorAsync, ReportError, () => IsEditing && !IsWorking && !_workspace.Clipboard.IsLocked);
+        _asyncCommands.Add(DiscardEditCommand);
         KeepEditingCommand = new RelayCommand(() => { DiscardEditOpen = false; EditorFocusRequested?.Invoke(); });
     }
     private async Task SaveRenameAsync()
@@ -108,7 +109,7 @@ internal sealed partial class ShellViewModel
     private void RequestCancelEdit()
     {
         if (EditDirty && !string.IsNullOrWhiteSpace(EditText)) { DiscardEditOpen = true; return; }
-        CancelEdit();
+        DiscardEditCommand.Execute(null);
     }
     private bool CanUseQueue() => HasQueue && !IsWorking && !IsEditing && !_workspace.Clipboard.IsLocked;
     private void RefreshWorkspaceCommands()

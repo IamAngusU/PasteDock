@@ -60,7 +60,7 @@ public sealed class EncryptedFileStore
             || undo.ExpiresAt - undo.DeletedAt > TimeSpan.FromMinutes(10)))
             throw new InvalidDataException("The deletion undo record is invalid. No content has been deleted.");
         var all = ReferencedEntries(state).ToArray();
-        if (all.Any(e => e is null || e.Id == Guid.Empty || e.BlobId == Guid.Empty
+        if (all.Any(e => e is null || e.Id == Guid.Empty || e.BlobId == Guid.Empty || e.SnippetId == Guid.Empty
                 || e.ByteCount < 0 || e.ByteCount > Limits.MaxPayloadBytes || e.CopyCount < 1 || e.Tags is null
                 || e.Title is null || e.Preview is null || e.SearchText is null || e.SourceApp is null
                 || e.Fingerprint is null || e.Fingerprint.Length != 64 || !e.Fingerprint.All(Uri.IsHexDigit)
@@ -69,6 +69,8 @@ public sealed class EncryptedFileStore
                 || e.SearchText.Length > Limits.SearchCharacters || e.SourceApp.Length > 100)
             || all.Select(e => e.Id).Distinct().Count() != all.Length
             || all.Select(e => e.BlobId).Distinct().Count() != all.Length
+            || state.Items.Where(e => e.SnippetIdentity.HasValue).Select(e => e.SnippetIdentity).Distinct().Count()
+                != state.Items.Count(e => e.SnippetIdentity.HasValue)
             || (state.Undo?.Items.Sum(e => e.ByteCount) ?? 0) > 128L * 1024 * 1024)
             throw new InvalidDataException("The history index is invalid. It has not been replaced.");
     }
@@ -85,6 +87,25 @@ public sealed class EncryptedFileStore
 
     public Task SaveSettingsAsync(AppSettings settings, CancellationToken ct = default) =>
         WriteAsync(Path.Combine(_root, "settings.pdv"), settings.Normalize(), ct, 2L * 1024 * 1024);
+
+    internal Task SaveDraftAsync(EditorDraft draft, CancellationToken ct)
+    {
+        draft.Validate();
+        return WriteAsync(Path.Combine(_root, "editor-draft.pdv"), new EditorDraftState(1, draft), ct, 8L * 1024 * 1024);
+    }
+
+    internal async Task<EditorDraft?> LoadDraftAsync(CancellationToken ct)
+    {
+        var path = Path.Combine(_root, "editor-draft.pdv");
+        if (!File.Exists(path)) return null;
+        var state = await ReadAsync<EditorDraftState>(path, 8L * 1024 * 1024, ct).ConfigureAwait(false);
+        if (state.Version != 1 || state.Draft is null)
+            throw new InvalidDataException("Unsupported editor recovery record. It has not been replaced.");
+        state.Draft.Validate();
+        return state.Draft;
+    }
+
+    internal void DeleteDraft() => File.Delete(Path.Combine(_root, "editor-draft.pdv"));
 
     public async Task<AppSettings> LoadSettingsAsync(CancellationToken ct = default)
     {

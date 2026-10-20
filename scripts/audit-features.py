@@ -15,6 +15,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 FEATURES = [
+    ("encrypted-editor-recovery", "0.6", {
+        "src/PasteDock.Core/Services/DraftRepository.cs": ["SaveCurrentAsync", "PrivacyPolicy.Evaluate", "EditorDraft.Lifetime"],
+        "src/PasteDock.Desktop/ViewModels/ShellViewModel.Drafts.cs": ["FlushEditorDraftAsync", "RestoreDraftAsync", "DiscardEditorAsync"],
+    }),
+    ("save-as-new-snippet", "0.6", {
+        "src/PasteDock.Core/Services/HistoryRepository.cs": ["CreateSnippetAsync", "snippetIdentities"],
+        "src/PasteDock.Desktop/ViewModels/ShellViewModel.Drafts.cs": ["SaveEditAsNewCommand"],
+    }),
+    ("revision-safe-editing", "0.6", {
+        "src/PasteDock.Core/Services/HistoryRepository.cs": ["LoadRevisionAsync", "ReplaceRevisionAsync", "expectedBlobId"],
+    }),
     ("independent-local-history", "baseline", {
         "src/PasteDock.Core/Services/HistoryRepository.cs": ["CaptureAsync", "SearchAsync"],
         "src/PasteDock.Core/Storage/EncryptedFileStore.cs": ["SavePayloadAsync", "LoadPayloadAsync"],
@@ -66,6 +77,9 @@ FEATURES = [
 ]
 
 FEATURE_ALIASES = {
+    "encrypted-editor-recovery": ["draft recovery", "autosave", "recover editor", "crash recovery"],
+    "save-as-new-snippet": ["save as new", "separate snippet", "copy snippet", "independent snippet"],
+    "revision-safe-editing": ["stale edit", "edit conflict", "changed original", "revision check"],
     "independent-local-history": ["clipboard history", "history", "local history", "win v history"],
     "type-to-search-on-open": ["type to search", "focus search", "search on open"],
     "pins-favorites-tags": ["pin", "favorite", "bookmark", "tag", "organize"],

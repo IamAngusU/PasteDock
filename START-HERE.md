@@ -1,6 +1,6 @@
 # Start with PasteDock
 
-Download the ZIP for your CPU from the [0.5.0 preview](https://github.com/IamAngusU/PasteDock/releases/tag/v0.5.0), extract the whole folder, and open **PasteDock.exe**. No setup wizard, admin rights, account or separate runtime is needed for the self-contained package. Builds are unsigned previews.
+Download the ZIP for your CPU from the [0.6.0 preview](https://github.com/IamAngusU/PasteDock/releases/tag/v0.6.0), extract the whole folder, and open **PasteDock.exe**. No setup wizard, admin rights, account or separate runtime is needed for the self-contained package. Builds are unsigned previews.
 
 Copy in any app, then press **Ctrl+Alt+V**. Search, choose a clip, press **Enter**. Use **Shift+Enter** for plain text. Press the down arrow from search to navigate clips. **Ctrl+K** opens commands. **Ctrl+,** opens settings.
 

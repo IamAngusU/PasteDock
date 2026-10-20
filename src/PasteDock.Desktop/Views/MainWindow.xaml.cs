@@ -182,7 +182,8 @@ public partial class MainWindow : Window
         }
         if (_viewModel.IsEditing)
         {
-            if (ctrl && key == Key.Enter) Run(_viewModel.SaveEditCommand);
+            if (modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && key == Key.Enter) Run(_viewModel.SaveEditAsNewCommand);
+            else if (ctrl && key == Key.Enter) Run(_viewModel.SaveEditCommand);
             return; // Never intercept normal editing shortcuts.
         }
         if (ctrl && key == Key.K) { Run(_viewModel.OpenPaletteCommand); return; }

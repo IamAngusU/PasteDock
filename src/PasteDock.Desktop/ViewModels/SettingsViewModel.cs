@@ -5,7 +5,7 @@ namespace PasteDock.Desktop.ViewModels;
 public sealed class SettingsViewModel : ObservableObject
 {
     private string _capacity = "2000", _days = "30", _storage = "512", _itemSize = "64", _excluded = "", _plainTargets = "", _theme = "Light", _error = "", _hotkey = "";
-    private bool _captureImages, _captureFiles, _startup, _topmost, _secrets, _cloud, _motion;
+    private bool _captureImages, _captureFiles, _startup, _topmost, _secrets, _cloud, _motion, _recoverDrafts;
     private uint _modifiers, _key;
     public string Capacity { get => _capacity; set => Set(ref _capacity, value); }
     public string RetentionDays { get => _days; set => Set(ref _days, value); }
@@ -23,6 +23,7 @@ public sealed class SettingsViewModel : ObservableObject
     public bool BlockSecrets { get => _secrets; set => Set(ref _secrets, value); }
     public bool PreventCloud { get => _cloud; set => Set(ref _cloud, value); }
     public bool ReducedMotion { get => _motion; set => Set(ref _motion, value); }
+    public bool RecoverDrafts { get => _recoverDrafts; set => Set(ref _recoverDrafts, value); }
     public string[] Themes { get; } = ["Light", "Dark"];
 
     public void Load(AppSettings settings)
@@ -38,6 +39,7 @@ public sealed class SettingsViewModel : ObservableObject
         StartWithWindows = settings.StartWithWindows; KeepOnTop = settings.KeepWindowOnTop;
         BlockSecrets = settings.BlockRecognizableSecrets; PreventCloud = settings.PreventCloudAndSystemHistory;
         ReducedMotion = settings.ReducedMotion;
+        RecoverDrafts = settings.RecoverEditorDrafts;
         SetHotkey(settings.HotkeyModifiers, settings.HotkeyKey, settings.HotkeyLabel);
         Error = "";
     }
@@ -63,6 +65,7 @@ public sealed class SettingsViewModel : ObservableObject
             Theme = Theme, CaptureImages = CaptureImages, CaptureFiles = CaptureFiles,
             StartWithWindows = StartWithWindows, KeepWindowOnTop = KeepOnTop,
             BlockRecognizableSecrets = BlockSecrets, PreventCloudAndSystemHistory = PreventCloud,
+            RecoverEditorDrafts = RecoverDrafts,
             ReducedMotion = ReducedMotion, HotkeyModifiers = _modifiers, HotkeyKey = _key, HotkeyLabel = HotkeyLabel
         };
     }

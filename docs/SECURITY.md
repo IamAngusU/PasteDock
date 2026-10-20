@@ -8,6 +8,12 @@ DPAPI schützt kopierte Datendateien nicht gegen alle Angreifer. Prozesse im gle
 
 Es gibt kein separates Vault-Passwort für die Live-Historie und keine isolierte Sicherheitsgrenze gegenüber anderen Prozessen des angemeldeten Benutzers. Windows-Session-Lock stoppt Capture und Paste und versteckt aktive Vorschauen. Vor Capture und Clipboard-Schreiben wird zusätzlich eine aktive Windows-Session mit zugänglichem Default-Eingabedesktop verlangt. Sichere oder benutzerdefinierte Win32-Desktops sind nicht als Capture-Ziele vorgesehen. Ein ungespeicherter Editorentwurf bleibt im Prozessspeicher, damit Sperren nicht zu Datenverlust führt. Die Paste-Queue wird beim Sperren geleert.
 
+## Verschlüsselte Editorentwürfe
+
+Standardmäßig speichert der Editor Änderungen nach einer Sekunde als separate DPAPI-Datei im Datenordner. Der sichtbare Sicherungsstatus unterscheidet ausstehende, gesicherte und abgelehnte Änderungen. Änderungen vor erfolgreicher Sicherung können bei einem Absturz verloren gehen. Es gibt höchstens einen Entwurf mit 1.048.576 Zeichen und maximal 8 MiB verschlüsselter Dateigröße. Er läuft sieben Tage nach seiner letzten gesicherten Änderung ab; Start, Wiederherstellen und stündliche Wartung prüfen dies.
+
+Die aktuellen Secret-, Ausschluss- und Größeneinstellungen gelten auch für diese Sicherung. Eine abgelehnte oder leere Fassung entfernt die vorherige Rettungskopie. Die Erkennung ist weiterhin heuristisch. Abschalten in den Einstellungen entfernt die Plattenkopie und behält den offenen Text im Arbeitsspeicher. Fehler dabei werden angezeigt. Entwürfe gehören weder zu portablen Backups noch zum normalen Clip-Kontingent. Sie unterliegen denselben DPAPI- und Speicherbereinigungsgrenzen wie die Historie.
+
 ## Clipboard ist ein gemeinsam genutzter Betriebssystemdienst
 
 Die App respektiert unterstützte private Clipboard-Marker, schließt konfigurierte Prozessnamen aus und kann einige erkennbare Geheimnisformate überspringen. Standardmäßig sind 1Password, Bitwarden, KeePass, KeePassXC und ProtonPass ausgeschlossen. Ausschlüsse gelten anhand des ermittelten Clipboard-Eigentümers beziehungsweise des aktiven Quellprozesses. Browserbasierte Passwortmanager sind damit nicht automatisch vollständig erkennbar.
@@ -30,7 +36,7 @@ Beschädigte oder nicht entschlüsselbare Speicherdateien führen nicht zum auto
 
 Ein Backup wird getrennt von DPAPI mit AES-256-GCM geschützt. Der Schlüssel wird mit PBKDF2-HMAC-SHA256, 600.000 Iterationen und einem zufälligen 128-Bit-Salt abgeleitet. Jedes Archiv bekommt eine neue 96-Bit-Nonce. Header, Ciphertext und 128-Bit-Authentifizierungstag werden beim Entschlüsseln geprüft. Der Header trägt die Formatversion; Parameteränderungen benötigen eine neue Formatversion.
 
-Export benötigt mindestens zwölf Zeichen Passphrase. Eine lange einzigartige Passphrase ist wichtiger als das bloße Erreichen dieser Mindestlänge. Es gibt keine Passphrase-Wiederherstellung. Falsches Passwort oder beschädigter Authentifizierungstag verhindern den Import. Ein Import wird gegen die lokalen Größen- und Kapazitätsgrenzen geprüft und verdrängt keine vorhandenen Inhalte. Bereits enthaltene Inhalte werden über formatbewusste Fingerprints erkannt und nicht dupliziert.
+Export benötigt mindestens zwölf Zeichen Passphrase. Eine lange einzigartige Passphrase ist wichtiger als das bloße Erreichen dieser Mindestlänge. Es gibt keine Passphrase-Wiederherstellung. Falsches Passwort oder beschädigter Authentifizierungstag verhindern den Import. Ein Import wird gegen die lokalen Größen- und Kapazitätsgrenzen geprüft und verdrängt keine vorhandenen Inhalte. Automatisch erfasste Duplikate werden über formatbewusste Fingerprints erkannt. Bewusst gespeicherte Snippets behalten eine eigene dauerhafte Identität: Identischer Text allein führt sie beim Import nicht zusammen. Ein bereits vorhandenes Snippet derselben Identität wird nicht durch eine ältere Backup-Fassung ersetzt.
 
 Authentifizierte Backup-Inhalte werden beim ausdrücklichen Import nicht erneut durch die heuristischen Capture-Secretfilter entfernt. Ein zuvor bewusst gespeichertes Geheimnis bleibt also Teil einer absichtlich wiederhergestellten Historie. Importierte Formate werden dennoch validiert.
 

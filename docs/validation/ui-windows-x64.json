@@ -1,11 +1,13 @@
 {
-  "timestampUtc": "2026-10-19T19:57:48.9153853+00:00",
+  "timestampUtc": "2026-10-20T09:31:45.9497833+00:00",
   "status": "passed",
   "validation": "Real WPF construction, data binding and off-screen rendering. Not a manual visual acceptance review.",
   "clipboardAccessed": false,
   "inputSynthesized": false,
   "realWorkspaceOpened": false,
   "screenshots": [
+    "compact-recovered-editor.png",
+    "dark-recovered-editor.png",
     "dark-settings.png",
     "dark-workspace.png",
     "light-color-inspector.png",
@@ -13,6 +15,9 @@
     "light-compare-popup.png",
     "light-deletion-undo.png",
     "light-draft-discard-review.png",
+    "light-draft-recovery-error.png",
+    "light-draft-recovery.png",
+    "light-editor-conflict.png",
     "light-first-use-paused.png",
     "light-first-use.png",
     "light-image-inspector.png",
@@ -20,6 +25,7 @@
     "light-invalid-settings.png",
     "light-no-results.png",
     "light-queue-copy-recovery.png",
+    "light-recovered-editor.png",
     "light-search-help.png",
     "light-settings.png",
     "light-workspace.png"
@@ -120,6 +126,58 @@
     },
     {
       "name": "Session lock clears preview and disables paste while preserving draft",
+      "status": "passed"
+    },
+    {
+      "name": "Draft autosave applies privacy rules and clears the stale recovery copy",
+      "status": "passed"
+    },
+    {
+      "name": "Explicit discard wins over an in-flight autosave",
+      "status": "passed"
+    },
+    {
+      "name": "Real autosave timer and restart recovery affordance",
+      "status": "passed"
+    },
+    {
+      "name": "Recovered editor renders in dark and actual compact layouts",
+      "status": "passed"
+    },
+    {
+      "name": "Restored editor saves exact text and removes recovery after commit",
+      "status": "passed"
+    },
+    {
+      "name": "Save as new preserves an unchanged original as a separate snippet",
+      "status": "passed"
+    },
+    {
+      "name": "Stale edit conflict preserves both versions through Save as new",
+      "status": "passed"
+    },
+    {
+      "name": "Missing-original recovery becomes a safe new snippet",
+      "status": "passed"
+    },
+    {
+      "name": "Failed draft discard preserves editable text and permits retry",
+      "status": "passed"
+    },
+    {
+      "name": "Committed snippet remains safe when recovery cleanup fails",
+      "status": "passed"
+    },
+    {
+      "name": "Unreadable recovery has retry and explicit discard without replacing history",
+      "status": "passed"
+    },
+    {
+      "name": "Rich clip edit preserves original formats and successful saves reveal the result",
+      "status": "passed"
+    },
+    {
+      "name": "Recovery setting removes disk copy while preserving the live editor",
       "status": "passed"
     },
     {

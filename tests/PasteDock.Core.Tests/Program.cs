@@ -41,6 +41,7 @@ internal static partial class Program
         RegisterV030();
         RegisterV040();
         RegisterV050();
+        RegisterV060();
         var results = new List<object>();
         var failed = 0;
         foreach (var (name, run) in Cases)

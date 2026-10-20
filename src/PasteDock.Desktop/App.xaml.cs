@@ -181,6 +181,7 @@ public partial class App : Application
                 try { await _workspace.SaveSettingsAsync(_window.WithCurrentGeometry(_workspace.Settings)); }
                 catch (Exception exception) { _workspace.Log.Write("GEOMETRY_SAVE_FAILED", exception); }
             }
+            if (_shell is not null) await _shell.FlushEditorDraftAsync();
             _shell?.Dispose();
             try { await _workspace.DisposeAsync(); }
             catch (Exception exception) { _workspace.Log.Write("SHUTDOWN_FAILED", exception); }

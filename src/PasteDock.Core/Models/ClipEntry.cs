@@ -9,6 +9,10 @@ public sealed record ClipEntry
     public string Title { get; init; } = "Untitled";
     public bool HasCustomTitle { get; init; }
     public bool IsSnippet { get; init; }
+    public Guid? SnippetId { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public Guid? SnippetIdentity => IsSnippet || string.Equals(SourceApp, "PasteDock", StringComparison.OrdinalIgnoreCase)
+        ? SnippetId ?? Id : null;
     public string Preview { get; init; } = "";
     public string SearchText { get; init; } = "";
     public string SourceApp { get; init; } = "Unknown";

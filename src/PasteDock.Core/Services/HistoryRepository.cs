@@ -66,6 +66,7 @@ public sealed class HistoryRepository
                     LastCopiedAt = fresh.LastCopiedAt,
                     SourceApp = fresh.SourceApp,
                     IsSnippet = existing.IsSnippet || existing.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
+                    SnippetId = existing.SnippetIdentity,
                     CopyCount = existing.CopyCount == int.MaxValue ? int.MaxValue : existing.CopyCount + 1
                 };
                 await CommitAsync(current.Select(e => e.Id == updated.Id ? updated : e).ToArray(), ct).ConfigureAwait(false);
@@ -88,14 +89,38 @@ public sealed class HistoryRepository
         finally { _gate.Release(); }
     }
 
+    public async Task<ClipEntry> CreateSnippetAsync(ClipPayload payload, AppSettings settings, CancellationToken ct = default)
+    {
+        payload.Validate(settings.MaxItemMb * 1024L * 1024);
+        if (string.IsNullOrWhiteSpace(payload.Text)) throw new InvalidOperationException("Write something before saving this snippet.");
+        var decision = PrivacyPolicy.Evaluate(payload, "PasteDock", settings);
+        if (!decision.Allowed) throw new InvalidOperationException(decision.Reason);
+        var fresh = ClipFactory.Create(payload, "PasteDock", _timeProvider.GetUtcNow());
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        try
+        {
+            if (_entries.Length >= settings.HistoryCapacity
+                || _entries.Sum(e => e.ByteCount) + fresh.ByteCount > settings.StorageLimitMb * 1024L * 1024)
+                throw new InvalidOperationException("There is no room for another snippet. Delete unused clips or increase the history limit. Your draft stays open.");
+            await _store.SavePayloadAsync(fresh.BlobId, payload, ct).ConfigureAwait(false);
+            try { await CommitAsync(_entries.Append(fresh).ToArray(), ct).ConfigureAwait(false); }
+            catch { _store.DeleteBlobBestEffort(fresh.BlobId); throw; }
+            return fresh;
+        }
+        finally { _gate.Release(); }
+    }
+
     public async Task<ClipPayload> LoadAsync(Guid id, CancellationToken ct = default)
+        => (await LoadRevisionAsync(id, ct).ConfigureAwait(false)).Payload;
+
+    public async Task<(ClipEntry Entry, ClipPayload Payload)> LoadRevisionAsync(Guid id, CancellationToken ct = default)
     {
         // Hold the mutation gate so an edit/delete cannot remove the blob while it is being read.
         await _gate.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             var entry = _entries.FirstOrDefault(e => e.Id == id) ?? throw new KeyNotFoundException("This item no longer exists.");
-            return await _store.LoadPayloadAsync(entry.BlobId, ct).ConfigureAwait(false);
+            return (entry, await _store.LoadPayloadAsync(entry.BlobId, ct).ConfigureAwait(false));
         }
         finally { _gate.Release(); }
     }
@@ -126,19 +151,29 @@ public sealed class HistoryRepository
         finally { _gate.Release(); }
     }
 
-    public async Task ReplacePayloadAsync(Guid id, ClipPayload payload, AppSettings settings, CancellationToken ct = default)
+    public Task ReplacePayloadAsync(Guid id, ClipPayload payload, AppSettings settings, CancellationToken ct = default) =>
+        ReplaceCoreAsync(id, payload, settings, null, ct);
+
+    public Task ReplaceRevisionAsync(Guid id, Guid expectedBlobId, ClipPayload payload, AppSettings settings, CancellationToken ct = default) =>
+        ReplaceCoreAsync(id, payload, settings, expectedBlobId, ct);
+
+    private async Task ReplaceCoreAsync(Guid id, ClipPayload payload, AppSettings settings, Guid? expectedBlobId, CancellationToken ct)
     {
         payload.Validate(settings.MaxItemMb * 1024L * 1024);
         var replacement = ClipFactory.Create(payload, "PasteDock", _timeProvider.GetUtcNow());
         await _gate.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            var previous = _entries.FirstOrDefault(e => e.Id == id) ?? throw new KeyNotFoundException("The item no longer exists.");
+            var previous = _entries.FirstOrDefault(e => e.Id == id);
+            if (expectedBlobId.HasValue && (previous is null || previous.BlobId != expectedBlobId.Value))
+                throw new InvalidOperationException("The original clip changed or was removed. Your draft is intact. Choose Save as new to keep both versions.");
+            if (previous is null) throw new KeyNotFoundException("The item no longer exists.");
             replacement = replacement with
             {
                 Id = previous.Id, CreatedAt = previous.CreatedAt, IsPinned = previous.IsPinned,
                 Title = previous.HasCustomTitle ? previous.Title : replacement.Title, HasCustomTitle = previous.HasCustomTitle,
                 IsSnippet = previous.IsSnippet || previous.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
+                SnippetId = previous.SnippetIdentity,
                 IsFavorite = previous.IsFavorite, Tags = previous.Tags, CopyCount = previous.CopyCount,
                 LastPastedAt = previous.LastPastedAt, SourceApp = previous.SourceApp
             };
@@ -207,19 +242,28 @@ public sealed class HistoryRepository
             }
             var next = _entries.ToList();
             var byFingerprint = next.Select((e, i) => (e, i))
+                .Where(pair => !pair.e.SnippetIdentity.HasValue)
                 .GroupBy(pair => pair.e.Fingerprint, StringComparer.Ordinal)
                 .ToDictionary(group => group.Key, group => group.First().i, StringComparer.Ordinal);
+            var snippetIdentities = next.Where(e => e.SnippetIdentity.HasValue).Select(e => e.SnippetIdentity).ToHashSet();
             var restored = 0; var merged = 0;
             foreach (var old in undo.Items)
             {
                 ct.ThrowIfCancellationRequested();
-                if (byFingerprint.TryGetValue(old.Fingerprint, out var index))
+                if (old.SnippetIdentity.HasValue)
+                {
+                    // Keep intentional copies separate. A backup import may already have restored this exact snippet.
+                    if (snippetIdentities.Add(old.SnippetIdentity)) { next.Add(old); restored++; }
+                    else merged++;
+                }
+                else if (byFingerprint.TryGetValue(old.Fingerprint, out var index))
                 {
                     var current = next[index];
                     // A copy made since deletion keeps its identity. Restore annotations without duplicating content.
                     next[index] = current with
                     {
-                        Title = old.Title,
+                        Title = current.HasCustomTitle ? current.Title : old.Title,
+                        HasCustomTitle = current.HasCustomTitle || old.HasCustomTitle,
                         IsPinned = current.IsPinned || old.IsPinned,
                         IsFavorite = current.IsFavorite || old.IsFavorite,
                         Tags = ClipFactory.NormalizeTags(old.Tags.Concat(current.Tags)),
@@ -341,20 +385,28 @@ public sealed class HistoryRepository
         {
             var next = _entries.ToList();
             var fingerprints = next.Select(e => e.Fingerprint).ToHashSet(StringComparer.Ordinal);
+            var snippetIdentities = next.Where(e => e.SnippetIdentity.HasValue).Select(e => e.SnippetIdentity).ToHashSet();
             foreach (var item in items)
             {
                 ct.ThrowIfCancellationRequested();
                 if (item is null || item.Entry is null || item.Payload is null || item.Entry.Title is null
-                    || item.Entry.SourceApp is null || item.Entry.Tags is null || item.Entry.Tags.Any(t => t is null) || item.Entry.CopyCount < 1)
+                    || item.Entry.SourceApp is null || item.Entry.Tags is null || item.Entry.Tags.Any(t => t is null) || item.Entry.CopyCount < 1
+                    || item.Entry.Id == Guid.Empty || item.Entry.SnippetId == Guid.Empty)
                     throw new InvalidDataException("The backup contains invalid metadata.");
                 item.Payload.Validate(settings.MaxItemMb * 1024L * 1024);
                 var fresh = ClipFactory.Create(item.Payload, item.Entry.SourceApp, _timeProvider.GetUtcNow());
-                if (!fingerprints.Add(fresh.Fingerprint)) continue;
+                if (item.Entry.SnippetIdentity.HasValue)
+                {
+                    if (!snippetIdentities.Add(item.Entry.SnippetIdentity)) continue;
+                    fingerprints.Add(fresh.Fingerprint);
+                }
+                else if (!fingerprints.Add(fresh.Fingerprint)) continue;
                 fresh = fresh with
                 {
                     Title = ClipFactory.Truncate(item.Entry.Title, 150),
                     HasCustomTitle = item.Entry.HasCustomTitle,
                     IsSnippet = item.Entry.IsSnippet || item.Entry.SourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
+                    SnippetId = item.Entry.SnippetIdentity,
                     IsPinned = item.Entry.IsPinned, IsFavorite = item.Entry.IsFavorite,
                     Tags = ClipFactory.NormalizeTags(item.Entry.Tags),
                     CreatedAt = item.Entry.CreatedAt, LastCopiedAt = item.Entry.LastCopiedAt,

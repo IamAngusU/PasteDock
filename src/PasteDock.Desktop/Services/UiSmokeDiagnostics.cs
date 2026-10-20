@@ -11,7 +11,7 @@ using PasteDock.Desktop.Views;
 
 namespace PasteDock.Desktop.Services;
 
-internal static class UiSmokeDiagnostics
+internal static partial class UiSmokeDiagnostics
 {
     /// <summary>Render the real WPF views against an isolated synthetic workspace. No clipboard access or input injection.</summary>
     public static async Task<int> RunAsync(string reportPath)
@@ -197,7 +197,7 @@ internal static class UiSmokeDiagnostics
             shell.EditText = "A synthetic draft. No private clipboard content is used by this check.";
             await SettleAsync(shell);
             await CaptureAsync(window, Path.Combine(output, "light-inline-editor.png"));
-            shell.DiscardEditCommand.Execute(null);
+            shell.DiscardEditCommand.Execute(null); await WaitCommandAsync(shell.DiscardEditCommand);
             checks.Add(new { name = "Inline editor rendered", status = "passed" });
 
             shell.NewSnippetCommand.Execute(null); shell.EditText = "A draft that should not disappear after Escape.";
@@ -207,7 +207,7 @@ internal static class UiSmokeDiagnostics
             shell.KeepEditingCommand.Execute(null);
             if (shell.DiscardEditOpen || shell.EditText != "A draft that should not disappear after Escape.")
                 throw new InvalidOperationException("Keep editing lost the draft.");
-            shell.CancelEditCommand.Execute(null); shell.DiscardEditCommand.Execute(null);
+            shell.CancelEditCommand.Execute(null); shell.DiscardEditCommand.Execute(null); await WaitCommandAsync(shell.DiscardEditCommand);
             if (shell.IsEditing) throw new InvalidOperationException("Explicit draft discard did not close the editor.");
             checks.Add(new { name = "Draft discard review preserves work until explicit discard", status = "passed" });
 
@@ -226,7 +226,7 @@ internal static class UiSmokeDiagnostics
             window.HidePanel(); window.Show();
             if (!shell.IsEditing || shell.EditText != "A draft survives hiding the workspace.")
                 throw new InvalidOperationException("Hiding the workspace lost the draft.");
-            shell.DiscardEditCommand.Execute(null);
+            shell.DiscardEditCommand.Execute(null); await WaitCommandAsync(shell.DiscardEditCommand);
             checks.Add(new { name = "Draft survives hide and reopen", status = "passed" });
 
             shell.OpenSettingsCommand.Execute(null);
@@ -281,9 +281,10 @@ internal static class UiSmokeDiagnostics
                 || shell.NewSnippetCommand.CanExecute(null) || shell.HasQueue || shell.PreviewText.Length > 0
                 || shell.EditText != "Unsaved draft survives Windows lock.")
                 throw new InvalidOperationException("Session lock did not disable actions and clear preview while preserving the draft.");
-            workspace.SetSessionLocked(false); shell.DiscardEditCommand.Execute(null); window.Show(); shell.OnShown(); await SettleAsync(shell);
+            workspace.SetSessionLocked(false); shell.DiscardEditCommand.Execute(null); await WaitCommandAsync(shell.DiscardEditCommand); window.Show(); shell.OnShown(); await SettleAsync(shell);
             checks.Add(new { name = "Session lock clears preview and disables paste while preserving draft", status = "passed" });
 
+            await RunDraftScenariosAsync(Path.Combine(root, "draft-scenarios"), output, checks);
             await workspace.History.DeleteAsync(workspace.History.Snapshot.Select(e => e.Id).ToArray()); await SettleAsync(shell);
             shell.Notify("Ready. Copy something to begin.");
             if (!shell.IsEmpty || shell.IsViewFiltered || shell.EmptyTitle != "Capture is paused")

@@ -1,19 +1,19 @@
 {
-  "timestampUtc": "2026-10-19T19:50:29.9742407+00:00",
-  "total": 167,
-  "passed": 167,
+  "timestampUtc": "2026-10-20T09:25:12.9990714+00:00",
+  "total": 197,
+  "passed": 197,
   "failed": 0,
   "results": [
     {
       "name": "Classify JSON before generic code",
       "status": "passed",
-      "milliseconds": 11,
+      "milliseconds": 14,
       "error": null
     },
     {
       "name": "Classify code",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -49,7 +49,7 @@
     {
       "name": "File reference name supports Windows paths",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 16,
       "error": null
     },
     {
@@ -127,7 +127,7 @@
     {
       "name": "Settings normalize bounds and nonfinite geometry",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 3,
       "error": null
     },
     {
@@ -139,7 +139,7 @@
     {
       "name": "Quoted search and filters parse together",
       "status": "passed",
-      "milliseconds": 15,
+      "milliseconds": 21,
       "error": null
     },
     {
@@ -151,7 +151,7 @@
     {
       "name": "Blank search matches metadata",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -175,7 +175,7 @@
     {
       "name": "Secret filtering rejects private key markers",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -211,7 +211,7 @@
     {
       "name": "Retention removes old unprotected content",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 11,
       "error": null
     },
     {
@@ -271,13 +271,13 @@
     {
       "name": "JSON pretty and compact preserve values",
       "status": "passed",
-      "milliseconds": 12,
+      "milliseconds": 34,
       "error": null
     },
     {
       "name": "Invalid JSON never silently changes",
       "status": "passed",
-      "milliseconds": 2,
+      "milliseconds": 4,
       "error": null
     },
     {
@@ -295,7 +295,7 @@
     {
       "name": "Base64 invalid UTF-8 is rejected",
       "status": "passed",
-      "milliseconds": 0,
+      "milliseconds": 1,
       "error": null
     },
     {
@@ -307,7 +307,7 @@
     {
       "name": "PNG bytes and dimensions survive encrypted round-trip",
       "status": "passed",
-      "milliseconds": 56,
+      "milliseconds": 93,
       "error": null
     },
     {
@@ -319,121 +319,121 @@
     {
       "name": "Encrypted repository round-trip preserves complete content",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 18,
       "error": null
     },
     {
       "name": "Index and blobs contain no plaintext canary",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Duplicate copies reuse identity and preserve tags",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 12,
       "error": null
     },
     {
       "name": "Concurrent capture is serialized",
       "status": "passed",
-      "milliseconds": 51,
+      "milliseconds": 86,
       "error": null
     },
     {
       "name": "Cancelled capture does not commit",
       "status": "passed",
-      "milliseconds": 2,
+      "milliseconds": 3,
       "error": null
     },
     {
       "name": "Editing changes blob revision, not item identity",
       "status": "passed",
-      "milliseconds": 10,
+      "milliseconds": 18,
       "error": null
     },
     {
       "name": "Metadata callback cannot replace identity or content",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Deletion survives reopening and removes blob",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Failed index protection leaves old transaction intact",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 15,
       "error": null
     },
     {
       "name": "Failed edited index keeps original blob readable",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 11,
       "error": null
     },
     {
       "name": "Faulty observer cannot roll back a committed item",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Tampered index is not replaced with empty history",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 13,
       "error": null
     },
     {
       "name": "Missing index never triggers destructive orphan cleanup",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Missing committed payload blocks startup cleanup",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Orphans are removed only after a valid index loads",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 10,
       "error": null
     },
     {
       "name": "Deep search finds text beyond the bounded index",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 12,
       "error": null
     },
     {
       "name": "Pins sort above recency",
       "status": "passed",
-      "milliseconds": 9,
+      "milliseconds": 15,
       "error": null
     },
     {
       "name": "Full protected history rejects capture without eviction",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 11,
       "error": null
     },
     {
       "name": "Backup requires a meaningful passphrase length",
       "status": "passed",
-      "milliseconds": 0,
+      "milliseconds": 1,
       "error": null
     },
     {
       "name": "Backup authenticates content, passphrase and header",
       "status": "passed",
-      "milliseconds": 288,
+      "milliseconds": 410,
       "error": null
     },
     {
@@ -445,181 +445,181 @@
     {
       "name": "Import merges without duplicating existing clips",
       "status": "passed",
-      "milliseconds": 14,
+      "milliseconds": 23,
       "error": null
     },
     {
       "name": "Over-quota import is atomic and does not evict originals",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 14,
       "error": null
     },
     {
       "name": "Encrypted settings round-trip",
       "status": "passed",
-      "milliseconds": 12,
+      "milliseconds": 22,
       "error": null
     },
     {
       "name": "Atomic writer keeps destination on cancellation",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 7,
       "error": null
     },
     {
       "name": "Import preserves historical dates and copy count",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Undo deletion hides content from search and backups",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 18,
       "error": null
     },
     {
       "name": "Undo restores exact identity rich formats and annotations",
       "status": "passed",
-      "milliseconds": 13,
+      "milliseconds": 25,
       "error": null
     },
     {
       "name": "Undo survives restart without orphan cleanup deleting its blobs",
       "status": "passed",
-      "milliseconds": 9,
+      "milliseconds": 14,
       "error": null
     },
     {
       "name": "A later deletion replaces only the previous undo batch",
       "status": "passed",
-      "milliseconds": 11,
+      "milliseconds": 20,
       "error": null
     },
     {
       "name": "Failed undo commit preserves both deletion state and stored content",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 11,
       "error": null
     },
     {
       "name": "Failed replacement deletion retains previous undo and live history",
       "status": "passed",
-      "milliseconds": 11,
+      "milliseconds": 24,
       "error": null
     },
     {
       "name": "Cancelled deletion does not mutate the index",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Cancelled undo leaves restoration available",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 10,
       "error": null
     },
     {
       "name": "Undo expires exactly at the ten minute boundary",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 12,
       "error": null
     },
     {
       "name": "Restart expires an old undo batch before orphan cleanup",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 11,
       "error": null
     },
     {
       "name": "Failed expiry commit never deletes referenced blobs",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Over quota restoration preserves undo rather than evicting live clips",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 15,
       "error": null
     },
     {
       "name": "Deleting unknown IDs does not replace the undo batch",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 10,
       "error": null
     },
     {
       "name": "Permanent deletion also discards the previous undo batch",
       "status": "passed",
-      "milliseconds": 9,
+      "milliseconds": 14,
       "error": null
     },
     {
       "name": "Discarding undo never deletes unrelated live clips",
       "status": "passed",
-      "milliseconds": 9,
+      "milliseconds": 15,
       "error": null
     },
     {
       "name": "Undo merges a recaptured duplicate without losing annotations",
       "status": "passed",
-      "milliseconds": 16,
+      "milliseconds": 46,
       "error": null
     },
     {
       "name": "Undo metadata and payload remain encrypted at rest",
       "status": "passed",
-      "milliseconds": 6,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Version one history migrates only through a successful commit",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 12,
       "error": null
     },
     {
       "name": "Unknown index version cannot trigger orphan cleanup",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Aliased blob IDs in an index are rejected",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 11,
       "error": null
     },
     {
       "name": "Invalid index fingerprints and copy counts are rejected",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 7,
       "error": null
     },
     {
       "name": "Snapshot collection cannot be replaced by a caller",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 8,
       "error": null
     },
     {
       "name": "Atomic text export preserves Unicode without adding a BOM",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 4,
       "error": null
     },
     {
       "name": "Cancelled export preserves an existing backup and removes temporary files",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Failed export rename cleans the staging file",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 8,
       "error": null
     },
     {
@@ -631,7 +631,7 @@
     {
       "name": "Bounded composition stops loading after exceeding its limit",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -655,13 +655,13 @@
     {
       "name": "Oversized undo is rejected without allocating or deleting content",
       "status": "passed",
-      "milliseconds": 12,
+      "milliseconds": 17,
       "error": null
     },
     {
       "name": "A failing observer cannot make undo appear uncommitted",
       "status": "passed",
-      "milliseconds": 8,
+      "milliseconds": 11,
       "error": null
     },
     {
@@ -697,7 +697,7 @@
     {
       "name": "Temporary file format keeps ambiguous text as txt",
       "status": "passed",
-      "milliseconds": 0,
+      "milliseconds": 101,
       "error": null
     },
     {
@@ -709,13 +709,13 @@
     {
       "name": "Diff identical content has only unchanged lines",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
       "name": "Diff replacement records removal and addition",
       "status": "passed",
-      "milliseconds": 0,
+      "milliseconds": 1,
       "error": null
     },
     {
@@ -751,13 +751,13 @@
     {
       "name": "Large edit distance uses bounded fallback",
       "status": "passed",
-      "milliseconds": 2,
+      "milliseconds": 3,
       "error": null
     },
     {
       "name": "Diff character budget is explicit",
       "status": "passed",
-      "milliseconds": 0,
+      "milliseconds": 1,
       "error": null
     },
     {
@@ -769,7 +769,7 @@
     {
       "name": "File reference check accepts a mixed file and directory selection",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -805,7 +805,7 @@
     {
       "name": "Missing file clips remain recoverable after reopening history",
       "status": "passed",
-      "milliseconds": 5,
+      "milliseconds": 113,
       "error": null
     },
     {
@@ -865,13 +865,13 @@
     {
       "name": "Deep exclusions inspect content beyond the instant index",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 6,
       "error": null
     },
     {
       "name": "Negative-only deep search reads the full payload",
       "status": "passed",
-      "milliseconds": 3,
+      "milliseconds": 7,
       "error": null
     },
     {
@@ -907,7 +907,7 @@
     {
       "name": "Repeated queued clips have separate completion tickets",
       "status": "passed",
-      "milliseconds": 2,
+      "milliseconds": 3,
       "error": null
     },
     {
@@ -925,7 +925,7 @@
     {
       "name": "Queue overflow is atomic and preserves all prior tickets",
       "status": "passed",
-      "milliseconds": 2,
+      "milliseconds": 3,
       "error": null
     },
     {
@@ -943,37 +943,37 @@
     {
       "name": "Renaming preserves full payload identity and encryption",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 13,
       "error": null
     },
     {
       "name": "Custom names survive editing and duplicate re-copy",
       "status": "passed",
-      "milliseconds": 9,
+      "milliseconds": 14,
       "error": null
     },
     {
       "name": "Invalid rename leaves title and content unchanged",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 7,
       "error": null
     },
     {
       "name": "Failed rename commit retains the old name on disk",
       "status": "passed",
-      "milliseconds": 4,
+      "milliseconds": 9,
       "error": null
     },
     {
       "name": "Encrypted backup retains custom names for later edits",
       "status": "passed",
-      "milliseconds": 125,
+      "milliseconds": 177,
       "error": null
     },
     {
       "name": "CSS shorthand color expands all RGBA components",
       "status": "passed",
-      "milliseconds": 1,
+      "milliseconds": 2,
       "error": null
     },
     {
@@ -991,7 +991,7 @@
     {
       "name": "A snippet remains a snippet after capture from another app",
       "status": "passed",
-      "milliseconds": 7,
+      "milliseconds": 19,
       "error": null
     },
     {
@@ -1004,6 +1004,186 @@
       "name": "Saved snippets survive automatic age retention without a pin",
       "status": "passed",
       "milliseconds": 0,
+      "error": null
+    },
+    {
+      "name": "Encrypted editor recovery survives reopening with exact Unicode",
+      "status": "passed",
+      "milliseconds": 13,
+      "error": null
+    },
+    {
+      "name": "Recovery expires at exactly seven days",
+      "status": "passed",
+      "milliseconds": 98,
+      "error": null
+    },
+    {
+      "name": "A newer draft revision restarts the recovery lifetime",
+      "status": "passed",
+      "milliseconds": 8,
+      "error": null
+    },
+    {
+      "name": "Recognizable secrets remove the previous recoverable revision",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Recovery opt-out deletes the old copy",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Oversized editor recovery is refused without stale fallback",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Blank draft removes its encrypted recovery copy",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Recovery applies the current maximum item bytes",
+      "status": "passed",
+      "milliseconds": 4,
+      "error": null
+    },
+    {
+      "name": "Startup opt-out clears an existing encrypted draft",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Recovery rechecks tightened privacy rules on load",
+      "status": "passed",
+      "milliseconds": 7,
+      "error": null
+    },
+    {
+      "name": "Unreadable recovery data is preserved for an explicit decision",
+      "status": "passed",
+      "milliseconds": 3,
+      "error": null
+    },
+    {
+      "name": "Unknown draft versions are not silently replaced",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Cancelled recovery writes preserve the committed draft",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Failed encryption keeps the previous recovery revision readable",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "A queued discard wins over an in-flight draft write",
+      "status": "passed",
+      "milliseconds": 6,
+      "error": null
+    },
+    {
+      "name": "Queued autosave rechecks privacy settings after waiting for storage",
+      "status": "passed",
+      "milliseconds": 10,
+      "error": null
+    },
+    {
+      "name": "Invalid base identities cannot replace a recoverable draft",
+      "status": "passed",
+      "milliseconds": 5,
+      "error": null
+    },
+    {
+      "name": "Recovery file size is bounded before decryption",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Intentional snippets with identical text keep separate identities",
+      "status": "passed",
+      "milliseconds": 11,
+      "error": null
+    },
+    {
+      "name": "Backup import preserves identical named snippets and remains idempotent",
+      "status": "passed",
+      "milliseconds": 27,
+      "error": null
+    },
+    {
+      "name": "Undo restores distinct snippets even when their content matches",
+      "status": "passed",
+      "milliseconds": 15,
+      "error": null
+    },
+    {
+      "name": "Import during deletion undo does not duplicate a saved snippet",
+      "status": "passed",
+      "milliseconds": 15,
+      "error": null
+    },
+    {
+      "name": "Older snippet identity survives import recopy and edit",
+      "status": "passed",
+      "milliseconds": 27,
+      "error": null
+    },
+    {
+      "name": "Stale editor revisions cannot overwrite a newer payload",
+      "status": "passed",
+      "milliseconds": 19,
+      "error": null
+    },
+    {
+      "name": "A deleted original leaves an editor save recoverable",
+      "status": "passed",
+      "milliseconds": 14,
+      "error": null
+    },
+    {
+      "name": "Metadata-only updates do not create false edit conflicts",
+      "status": "passed",
+      "milliseconds": 15,
+      "error": null
+    },
+    {
+      "name": "Manual snippet saves never silently evict other clips",
+      "status": "passed",
+      "milliseconds": 9,
+      "error": null
+    },
+    {
+      "name": "Manual snippet saves apply the same secret filter",
+      "status": "passed",
+      "milliseconds": 2,
+      "error": null
+    },
+    {
+      "name": "Undo keeps custom names durable through the next edit",
+      "status": "passed",
+      "milliseconds": 22,
+      "error": null
+    },
+    {
+      "name": "Editor recovery is excluded from portable history backups",
+      "status": "passed",
+      "milliseconds": 7,
       "error": null
     }
   ]

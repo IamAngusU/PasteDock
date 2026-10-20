@@ -40,10 +40,24 @@ Choose a filter from the toolbar or sidebar. The toolbar stays available when a 
 
 Hiding the window preserves an unfinished draft. Cancelling changed text opens an inline choice: keep editing or discard changes. Quit asks you to finish or cancel the edit first. Windows lock hides the window and clears previews while retaining the draft in RAM.
 
-Drafts are not crash recovery. They are not autosaved to disk, particularly because a draft may contain a recognizable secret that saving would reject. Save a valid snippet when you want durable storage.
+Changed editor text gets one encrypted local recovery copy after one second. The status distinguishes waiting, successful encryption, privacy rejection, size limits and storage failure. Changes before the timer completes, or after a reported failure, are not guaranteed to survive a crash. Save your snippet for durable history.
+
+At the next launch, choose **Restore draft** or review **Discard...**. New edits stay disabled until you resolve the copy. Unreadable recovery stays in place with retry and explicit discard actions. A draft whose original changed or disappeared is restored as a new snippet. Active editors also verify the original payload revision before replacing it.
+
+Recovery holds one draft of up to 1,048,576 characters, expiring seven days after its last saved revision. Expiry and current privacy rules are checked at startup, on restore and during hourly maintenance. Rejected or blank revisions remove their earlier recovery copy. Drafts are excluded from portable backups and the ordinary clip quota; the encrypted file is additionally capped at 8 MiB.
+
+Turn **Recover editor drafts after restart** off in Settings to remove the disk copy and retain the live editor. Failed removal is reported for retry. Cancellation closes the editor only after removing recovery. If history saves but cleanup fails, PasteDock reports the successful save and offers cleanup separately.
+
+## Keep the original while editing
+
+**Ctrl+Enter** saves changes to the clip you opened. **Save as new** or **Ctrl+Shift+Enter** creates a separate protected snippet, including when its text matches another clip. Stable snippet identities survive backup import, re-copying and edits. Reimporting an existing identity skips it and never replaces a newer version. Older snippets migrate using their original clip identity.
+
+Manual new-snippet saves refuse to exceed the item or content limit without evicting other clips. Failed saves leave your editor open. Successful new snippets are selected in **My snippets**.
 
 ## Inspect content
 
 The text preview can wrap or scroll horizontally; both modes keep the original content unchanged. Text tools, export and queue actions are directly visible below the preview. Colors use CSS hex order (#RGB, #RGBA, #RRGGBB, #RRGGBBAA); the last component is alpha.
 
 Images retain their original PNG bytes. Inspection decodes a bounded preview; local OCR still needs installed Windows recognition languages. File clips are references. Missing sources are rejected before replacing the clipboard; use plain text if you only need their paths.
+
+Editing stores plain text. When a clip also contains HTML, RTF, image data or file references, the editor explains that saving changes replaces those formats. Use Save as new to preserve the original. After a successful save, PasteDock clears the previous query and reveals the result so it cannot disappear behind an outdated search filter.

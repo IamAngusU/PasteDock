@@ -12,6 +12,12 @@ Der WPF-Dispatcher besitzt UI, Auswahl, Einstellungen und Benutzeraktionen. Ein 
 
 Jeder Capture erhält eine Epochennummer. Pause, Session-Lock und geänderte Ausschlüsse erhöhen diese Nummer. Veraltete wartende Captures werden verworfen. Vor der Speicherung prüft der Worker die aktuelle Datenschutzentscheidung erneut. Eine bereits laufende atomare Speicherung kann beim Sperren noch abschließen; die Funktion verspricht kein nachträgliches Zurückrollen bereits begonnener Transaktionen.
 
+## Editor und Wiederherstellung
+
+Der Editor hält Text und ursprüngliche Blob-Revision zusammen. LoadRevisionAsync liest Metadaten und Payload unter derselben Repository-Sperre; ReplaceRevisionAsync prüft die Basisrevision unmittelbar vor dem Commit. Ein Konflikt erhält den Entwurf. CreateSnippetAsync erzeugt bewusst eine unabhängige Identität und verdrängt keine anderen Clips. Stabile Snippet-Identitäten überleben portable Imports, auch wenn die lokalen Clip- und Blob-IDs neu erzeugt werden.
+
+Ein Dispatcher-Timer sammelt Editoränderungen. Ein eigener asynchroner Gate serialisiert Snapshots, Speicherung und Verwerfen. Nach dem Warten werden Editorzustand und aktuelle Datenschutzeinstellungen erneut geprüft, damit eine alte Sicherung keinen bereits verworfenen Entwurf wiederherstellt. DraftRepository schreibt eine begrenzte, verschlüsselte Datei unabhängig vom History-Index. Erst nach dauerhaftem History-Commit wird die Rettungskopie entfernt. Ein Fehler in diesem letzten Schritt wird als erfolgreiche Clip-Speicherung mit gesondertem Bereinigungsproblem gemeldet.
+
 ## Inhalt ist nicht Vorschau
 
 `ClipPayload` enthält die vollständigen unterstützten Formate. `ClipEntry` enthält ausschließlich die Metadaten und begrenzte Such-/Vorschaustrings. Kopieren, Bearbeiten, Exportieren und Paste-Queue laden Original-Payloads über das Repository. Kein Paste-Pfad verwendet `PreviewText`.

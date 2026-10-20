@@ -25,7 +25,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     private Guid[] _selectedIds = [], _pendingDeleteIds = [];
     private string _deleteDescription = "Delete keeps an encrypted undo copy for ten minutes, up to 128 MiB. A new deletion replaces the previous undo copy. The system clipboard is unchanged.";
     private PasteTarget? _target;
-    private Guid? _editingId;
+    private Guid? _editingId, _editingBlobId, _loadedBlobId, _revealClipId;
     private int _previewLength = 65_536;
     private bool _disposed;
     private string _transformResult = "";
@@ -64,7 +64,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         new("Alt 1...9", "Paste one of the first nine visible results immediately"), new("Ctrl D", "Compare exactly two selected clips"),
         new("Ctrl Z", "Undo the last deletion (outside text inputs)"), new("Ctrl T", "Add tags"), new("Ctrl Q", "Queue selected clips, top to bottom"), new("Delete", "Review deletion"),
         new("Ctrl K", "Command menu"), new("Ctrl F", "Focus search"), new("Ctrl ,", "Settings"),
-        new("Ctrl Enter", "Save inline edit"), new("Escape", "Cancel edit, close popover or hide window")
+        new("Ctrl Enter", "Save inline edit"), new("Ctrl Shift Enter", "Save an edited clip as a new snippet"), new("Escape", "Cancel edit, close popover or hide window")
     ];
 
     public event Action? HideRequested;
@@ -129,7 +129,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     public bool PreviewBusy { get => _previewBusy; private set => Set(ref _previewBusy, value); }
     public bool IsEditing { get => _isEditing; private set { if (Set(ref _isEditing, value)) { Raise(nameof(IsBrowsing)); Raise(nameof(HasPreview)); RefreshCommands(); } } }
     public bool IsBrowsing => !IsEditing;
-    public string EditText { get => _editText; set { if (Set(ref _editText, value)) Raise(nameof(EditDirty)); } }
+    public string EditText { get => _editText; set { if (Set(ref _editText, value)) { Raise(nameof(EditDirty)); ScheduleDraftSave(); } } }
     public bool ShowImage { get => _showImage; set { if (Set(ref _showImage, value)) Raise(nameof(ShowText)); } }
     public bool ShowText => !ShowImage && !ShowColor;
     public bool SettingsOpen { get => _settingsOpen; set => Set(ref _settingsOpen, value); }
@@ -156,7 +156,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     public bool HasError { get; private set; }
     public bool HasImage => _loaded?.Png is not null;
     public bool HasExtractedText => !string.IsNullOrEmpty(_loaded?.OcrText);
-    public bool CanEdit => _loaded?.Text is not null && !IsEditing && !IsWorking;
+    public bool CanEdit => _loaded?.Text is not null && !IsEditing && !IsWorking && !DraftRecoveryPending && !_workspace.Clipboard.IsLocked;
     public bool CanTransform => _loaded is not null && (_loaded.Text is not null || _loaded.OcrText is not null || _loaded.Files.Length > 0) && !IsEditing;
     public bool IsPaused => _workspace.Clipboard.IsPaused;
     public string CaptureLabel => _workspace.Clipboard.IsLocked ? "Locked" : IsPaused ? "Paused" : "Capturing";
@@ -195,7 +195,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         }
         FilterCommand = new RelayCommand(parameter => SetFilter(parameter is FilterOption filter ? filter.Key : parameter?.ToString() ?? "all"));
         PauseCommand = new RelayCommand(() => { workspace.TogglePause(); });
-        NewSnippetCommand = new RelayCommand(BeginNew, () => !IsEditing && !IsWorking && !workspace.Clipboard.IsLocked);
+        NewSnippetCommand = new RelayCommand(BeginNew, () => !IsEditing && !IsWorking && !DraftRecoveryPending && !workspace.Clipboard.IsLocked);
         EditCommand = new RelayCommand(BeginEdit, () => CanEdit);
         CancelEditCommand = new RelayCommand(RequestCancelEdit, () => !IsWorking);
         OpenSettingsCommand = new RelayCommand(() => { Settings.Load(workspace.Settings); ClosePopovers(); SettingsOpen = true; });
@@ -244,6 +244,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         CopyDiffCommand = Async(CopyDiffAsync, () => CompareOpen && !IsWorking && !string.IsNullOrEmpty(CompareText));
         SaveDiffCommand = Async(SaveDiffAsync, () => CompareOpen && !IsWorking && !string.IsNullOrEmpty(CompareText));
         InitializeWorkspaceCommands();
+        InitializeDraftRecovery();
         _allPaletteItems =
         [
             new("New snippet", "Ctrl N", NewSnippetCommand), new("Pause / resume capture", "", PauseCommand),
@@ -378,6 +379,12 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         }
         for (var i = 0; i < Items.Count; i++) Items[i].SetQuickIndex(i);
         if (SelectedItem is null || !desired.Contains(SelectedItem.Id)) SelectedItem = Items.FirstOrDefault();
+        if (_revealClipId is Guid revealId && Items.FirstOrDefault(item => item.Id == revealId) is { } revealed)
+        {
+            _revealClipId = null; _selectedIds = [revealId];
+            if (ReferenceEquals(SelectedItem, revealed)) LoadPreview();
+            else SelectedItem = revealed;
+        }
     }
 
     private async void LoadPreview()
@@ -392,7 +399,8 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         try
         {
             if (selected is null) return;
-            var payload = await Task.Run(() => _workspace.History.LoadAsync(selected.Id, token), token);
+            var revision = await Task.Run(() => _workspace.History.LoadRevisionAsync(selected.Id, token), token);
+            var payload = revision.Payload;
             BitmapSource? image = null;
             if (payload.Png is not null)
             {
@@ -410,7 +418,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
             }
             token.ThrowIfCancellationRequested();
             if (_workspace.Clipboard.IsLocked || _disposed) return;
-            _loaded = payload; PreviewImage = image; ShowImage = image is not null;
+            _loaded = payload; _loadedBlobId = revision.Entry.BlobId; PreviewImage = image; ShowImage = image is not null;
             RefreshTextPreview();
         }
         catch (OperationCanceledException) { }
@@ -469,15 +477,16 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     }
     private void BeginNew()
     {
-        ClosePopovers(); _editingId = null; _editOriginal = ""; EditText = ""; IsEditing = true; EditorFocusRequested?.Invoke();
+        ClosePopovers(); _editingId = null; _editingBlobId = null; _editingHasOtherFormats = false; _editOriginal = ""; EditText = ""; IsEditing = true; StartDraftSession(); EditorFocusRequested?.Invoke();
     }
     private void BeginEdit()
     {
         if (!CanEdit) return;
-        ClosePopovers(); _editingId = SelectedItem!.Id; _editOriginal = _loaded!.Text!; EditText = _editOriginal; IsEditing = true; EditorFocusRequested?.Invoke();
+        ClosePopovers(); _editingId = SelectedItem!.Id; _editingBlobId = _loadedBlobId; _editingHasOtherFormats = HasOtherFormats(_loaded!); _editOriginal = _loaded!.Text!; EditText = _editOriginal; IsEditing = true; StartDraftSession(); EditorFocusRequested?.Invoke();
     }
-    private void CancelEdit() { DiscardEditOpen = false; IsEditing = false; EditText = ""; _editingId = null; _editOriginal = ""; }
-    private async Task SaveEditAsync()
+    private void CancelEdit() { _draftTimer.Stop(); DiscardEditOpen = false; IsEditing = false; EditText = ""; _editingId = null; _editingBlobId = null; _editOriginal = ""; RaiseEditorIdentity(); }
+    private Task SaveEditAsync() => SaveEditorAsync(false);
+    private async Task SaveEditorAsync(bool asNew)
     {
         IsWorking = true;
         try
@@ -487,9 +496,27 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
             var payload = new ClipPayload { Text = EditText };
             var decision = PrivacyPolicy.Evaluate(payload, "PasteDock", _workspace.Settings);
             if (!decision.Allowed) throw new InvalidOperationException(decision.Reason);
-            if (_editingId is Guid id) await Task.Run(() => _workspace.History.ReplacePayloadAsync(id, payload, _workspace.Settings));
-            else await Task.Run(() => _workspace.History.CaptureAsync(payload, "PasteDock", _workspace.Settings));
-            CancelEdit(); LoadPreview(); Notify("Snippet saved. The system clipboard was not changed.");
+            var id = _editingId; var blob = _editingBlobId;
+            Guid savedId;
+            if (!asNew && id.HasValue && blob.HasValue)
+            {
+                await Task.Run(() => _workspace.History.ReplaceRevisionAsync(id.Value, blob.Value, payload, _workspace.Settings));
+                savedId = id.Value;
+            }
+            else
+                savedId = (await Task.Run(() => _workspace.History.CreateSnippetAsync(payload, _workspace.Settings))).Id;
+            // The history commit is durable before the recovery copy is removed.
+            try { await ClearEditorRecoveryAsync(); }
+            catch (Exception exception)
+            {
+                _workspace.Log.Write("SAVED_DRAFT_CLEANUP_FAILED", exception);
+                _draftRecoveryProblem = true;
+                CancelEdit(); LoadPreview(); RefreshDraftRecovery();
+                throw new InvalidOperationException("Your clip was saved, but its recovery copy could not be removed. Discard the recovery copy before editing again.");
+            }
+            CancelEdit(); _revealClipId = savedId;
+            SearchText = ""; SetFilter(asNew || !id.HasValue ? "snippets" : "all");
+            Notify(asNew ? "Saved as a new snippet. The original clip is unchanged." : "Saved. The system clipboard was not changed.");
         }
         finally { IsWorking = false; }
     }
@@ -586,17 +613,22 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     private async Task SaveSettingsAsync()
     {
         Settings.Error = "";
+        IsWorking = true;
         try
         {
             var next = Settings.Build(_workspace.Settings);
             if (ApplySettings is not null) await ApplySettings(next);
             else await _workspace.SaveSettingsAsync(next);
             SettingsOpen = false;
+            if (!_workspace.Settings.RecoverEditorDrafts)
+            { _recoveryDraft = null; _draftRecoveryProblem = false; RefreshDraftRecovery(); }
+            if (IsEditing) ScheduleDraftSave();
             Raise(nameof(HotkeyLabel)); Raise(nameof(ReducedMotion)); Raise(nameof(StorageLabel)); Raise(nameof(TargetPlainRuleLabel));
             Notify("Settings saved.");
         }
         catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
         { Settings.Error = exception.Message; }
+        finally { IsWorking = false; }
     }
 
     public async Task BackupAsync(bool import, string passphrase)
@@ -651,6 +683,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
         _previewCancellation?.Cancel(); _searchCancellation?.Cancel();
         _loaded = null; PreviewText = ""; PreviewImage = null;
         // Keep an unsaved editor draft in RAM; session lock must not silently discard work.
+        _ = FlushEditorDraftAsync();
         TransformPreview = ""; _transformResult = ""; TransformReady = false;
         _queue.Clear(); QueueChanged(); ClosePopovers(); ClearCompareState(); SettingsOpen = false;
         HideRequested?.Invoke();
@@ -675,7 +708,7 @@ internal sealed partial class ShellViewModel : ObservableObject, IDisposable
     }
     public void Dispose()
     {
-        _disposed = true; _clock.Stop();
+        _disposed = true; _clock.Stop(); _draftTimer.Stop();
         _searchCancellation?.Cancel(); _previewCancellation?.Cancel();
         _searchCancellation?.Dispose(); _previewCancellation?.Dispose();
         _workspace.History.Changed -= OnHistoryChanged; _workspace.Notice -= OnNotice; _workspace.CaptureStateChanged -= OnCaptureState;

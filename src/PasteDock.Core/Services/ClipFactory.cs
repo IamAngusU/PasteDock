@@ -28,6 +28,7 @@ public static partial class ClipFactory
             SearchText = Truncate(searchable, Limits.SearchCharacters),
             SourceApp = Truncate(sourceApp, 100),
             IsSnippet = sourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase),
+            SnippetId = sourceApp.Equals("PasteDock", StringComparison.OrdinalIgnoreCase) ? Guid.NewGuid() : null,
             CreatedAt = now,
             LastCopiedAt = now,
             ByteCount = payload.GetByteCount(),

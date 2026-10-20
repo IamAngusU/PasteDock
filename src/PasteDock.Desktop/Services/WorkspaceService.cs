@@ -16,6 +16,9 @@ internal sealed class WorkspaceService : IAsyncDisposable
     public AppSettings Settings => Volatile.Read(ref _settings);
     public EncryptedFileStore Store { get; }
     public HistoryRepository History { get; }
+    public DraftRepository Drafts { get; }
+    public EditorDraft? RecoveryDraft { get; private set; }
+    public bool DraftRecoveryProblem { get; private set; }
     public WindowsClipboardService Clipboard { get; } = new();
     public PasteService Paste { get; }
     public TemporaryPasteFileService PasteFiles { get; }
@@ -28,6 +31,7 @@ internal sealed class WorkspaceService : IAsyncDisposable
     {
         Store = new EncryptedFileStore(root, new DpapiProtector());
         History = new HistoryRepository(Store);
+        Drafts = new DraftRepository(Store);
         Paste = new PasteService(Clipboard);
         PasteFiles = new TemporaryPasteFileService(root);
         Log = new SafeLog(root);
@@ -44,6 +48,7 @@ internal sealed class WorkspaceService : IAsyncDisposable
         await Task.Run(PasteFiles.CleanupBestEffort).ConfigureAwait(false);
         await Task.Run(() => History.InitializeAsync()).ConfigureAwait(false);
         await History.PruneAsync(Settings).ConfigureAwait(false);
+        await LoadDraftRecoveryAsync().ConfigureAwait(false);
         _consumer = Task.Run(ConsumeAsync);
         _maintenance = Task.Run(MaintainAsync);
         await Clipboard.StartAsync(Settings).ConfigureAwait(false);
@@ -67,8 +72,28 @@ internal sealed class WorkspaceService : IAsyncDisposable
         await Task.Run(() => Store.SaveSettingsAsync(normalized)).ConfigureAwait(false);
         Volatile.Write(ref _settings, normalized);
         Clipboard.UpdateSettings(normalized);
+        if (!normalized.RecoverEditorDrafts)
+        {
+            try { await Drafts.ClearAsync().ConfigureAwait(false); }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                Log.Write("DRAFT_OPTOUT_CLEANUP_FAILED", exception);
+                throw new InvalidOperationException("Settings were saved, but the previous recovery copy could not be removed. Close apps using the data folder and save these settings again.");
+            }
+            RecoveryDraft = null; DraftRecoveryProblem = false;
+        }
         try { await History.PruneAsync(normalized).ConfigureAwait(false); }
         catch (Exception exception) { Log.Write("RETENTION_FAILED", exception); Notice?.Invoke("Settings were saved, but history cleanup could not finish."); }
+    }
+
+    public async Task LoadDraftRecoveryAsync()
+    {
+        try { RecoveryDraft = await Drafts.LoadAsync(Settings).ConfigureAwait(false); DraftRecoveryProblem = false; }
+        catch (Exception exception)
+        {
+            Log.Write("DRAFT_RECOVERY_FAILED", exception);
+            RecoveryDraft = null; DraftRecoveryProblem = true;
+        }
     }
 
     private async Task ConsumeAsync()
@@ -92,6 +117,7 @@ internal sealed class WorkspaceService : IAsyncDisposable
     private async Task MaintainAsync()
     {
         using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        var nextDraftReview = DateTimeOffset.UtcNow.AddHours(1);
         try
         {
             while (await timer.WaitForNextTickAsync(_stop.Token).ConfigureAwait(false))
@@ -99,6 +125,13 @@ internal sealed class WorkspaceService : IAsyncDisposable
                 try { await History.PruneAsync(Settings, _stop.Token).ConfigureAwait(false); }
                 catch (OperationCanceledException) when (_stop.IsCancellationRequested) { break; }
                 catch (Exception exception) { Log.Write("MAINTENANCE_FAILED", exception); }
+                if (DateTimeOffset.UtcNow >= nextDraftReview)
+                {
+                    nextDraftReview = DateTimeOffset.UtcNow.AddHours(1);
+                    try { await Drafts.LoadAsync(Settings, _stop.Token).ConfigureAwait(false); }
+                    catch (OperationCanceledException) when (_stop.IsCancellationRequested) { break; }
+                    catch (Exception exception) { Log.Write("DRAFT_MAINTENANCE_FAILED", exception); }
+                }
                 PasteFiles.CleanupBestEffort();
             }
         }

@@ -199,7 +199,7 @@
                     <ToggleButton Content="Image" IsChecked="{Binding ShowImage}" Visibility="{Binding HasImage, Converter={StaticResource Visible}}" FontSize="10" MinHeight="24" Padding="6,2" />
                   </StackPanel>
                   <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <ToggleButton Content="Wrap" IsChecked="{Binding WrapText}" FontSize="10" Padding="5,1" MinHeight="24" Margin="0,0,5,0" ToolTip="Wrap the preview without changing its content" />
+                    <ToggleButton Content="Wrap" Foreground="{DynamicResource TextBrush}" IsChecked="{Binding WrapText}" FontSize="10" Padding="5,1" MinHeight="24" Margin="0,0,5,0" ToolTip="Wrap the preview without changing its content" />
                     <Button Content="A−" Command="{Binding ZoomTextOutCommand}" FontSize="10" Padding="5,1" MinHeight="24" ToolTip="Smaller preview text" />
                     <Button Content="A+" Command="{Binding ZoomTextInCommand}" FontSize="10" Padding="5,1" MinHeight="24" ToolTip="Larger preview text" />
                   </StackPanel>
@@ -237,18 +237,30 @@
             </Border>
             <Button Content="Create your first snippet" Command="{Binding NewSnippetCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Center" />
           </StackPanel>
+          <Border Background="{DynamicResource SurfaceBrush}" Visibility="{Binding DraftRecoveryPending, Converter={StaticResource Visible}}">
+            <StackPanel VerticalAlignment="Center" Margin="4,12" MaxWidth="400">
+              <TextBlock Text="{Binding RecoveryHeading}" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding RecoveryDescription}" Foreground="{DynamicResource SecondaryBrush}" FontSize="13" TextWrapping="Wrap" LineHeight="21" Margin="0,14,0,20" />
+              <WrapPanel><Button Content="Restore draft" Style="{StaticResource PrimaryButton}" Command="{Binding RestoreDraftCommand}" Margin="0,0,8,8" /><Button Content="Retry" Command="{Binding RetryDraftCommand}" Margin="0,0,4,8" /><Button Content="Discard..." Command="{Binding DiscardRecoveryCommand}" Margin="0,0,0,8" /></WrapPanel>
+              <Border BorderBrush="{DynamicResource DangerBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,12,0,0" Visibility="{Binding DiscardRecoveryOpen, Converter={StaticResource Visible}}">
+                <StackPanel><TextBlock Text="Permanently discard this recovery copy?" FontWeight="SemiBold" TextWrapping="Wrap" /><TextBlock Text="Your saved clips stay available. This unfinished draft cannot be restored afterwards." Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" FontSize="11" Margin="0,7,0,10" /><WrapPanel><Button Content="Keep draft" Command="{Binding KeepRecoveryCommand}" Margin="0,0,6,0" /><Button Content="Discard recovery copy" Command="{Binding ConfirmDiscardRecoveryCommand}" Foreground="{DynamicResource DangerBrush}" /></WrapPanel></StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
           <!-- Inline editor replaces the inspector, without an overlay -->
           <Grid Background="{DynamicResource SurfaceBrush}" Visibility="{Binding IsEditing, Converter={StaticResource Visible}}">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <TextBlock Text="Snippet editor" Style="{StaticResource SectionLabel}" />
-            <TextBlock Grid.Row="1" Text="Make it worth keeping." FontSize="21" FontWeight="SemiBold" Margin="0,0,0,18" />
-            <TextBox Grid.Row="2" x:Name="Editor" Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" FontFamily="{DynamicResource MonoFont}" FontSize="13" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap" Padding="14" AutomationProperties.Name="Snippet editor" />
+            <Grid Grid.Row="1" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBlock Text="{Binding EditorHeading}" FontSize="21" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap" /><CheckBox Grid.Column="1" Content="Wrap" Foreground="{DynamicResource TextBrush}" IsChecked="{Binding WrapText}" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip="Wrap long lines in the editor and preview" /></Grid>
+            <TextBox Grid.Row="2" x:Name="Editor" Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsWorking}" AcceptsReturn="True" AcceptsTab="True" FontFamily="{DynamicResource MonoFont}" FontSize="13" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="{Binding PreviewWrapping}" Padding="14" AutomationProperties.Name="Snippet editor" />
             <StackPanel Grid.Row="3" Margin="0,14,0,0">
               <Border Background="{DynamicResource DangerSoftBrush}" BorderBrush="{DynamicResource DangerBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,10" Visibility="{Binding DiscardEditOpen, Converter={StaticResource Visible}}">
                 <StackPanel><TextBlock Text="Discard your changes?" FontWeight="SemiBold" FontSize="13" /><TextBlock Text="Your draft has changes that have not been saved." FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryBrush}" Margin="0,5,0,9" /><WrapPanel><Button Content="Keep editing" Command="{Binding KeepEditingCommand}" Style="{StaticResource OutlinedButton}" Margin="0,0,7,0" /><Button Content="Discard changes" Command="{Binding DiscardEditCommand}" Foreground="{DynamicResource DangerBrush}" /></WrapPanel></StackPanel>
               </Border>
-              <TextBlock Text="Saves plain text. The clipboard stays unchanged." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,0,0,12" />
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Cancel" Command="{Binding CancelEditCommand}" Margin="0,0,7,0" /><Button Content="Save snippet" Style="{StaticResource PrimaryButton}" Command="{Binding SaveEditCommand}" ToolTip="Save · Ctrl+Enter" /></StackPanel>
+              <TextBlock Text="{Binding EditorLengthLabel}" FontSize="10" Foreground="{DynamicResource SecondaryBrush}" Margin="0,0,0,5" />
+              <TextBlock Text="{Binding EditorFormatHint}" FontSize="10" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,5" />
+              <TextBlock Text="{Binding DraftStatus}" FontSize="11" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,12" AutomationProperties.LiveSetting="Polite" />
+              <WrapPanel HorizontalAlignment="Right"><Button Content="Cancel" Command="{Binding CancelEditCommand}" Margin="0,0,6,5" /><Button Content="Save as new" Command="{Binding SaveEditAsNewCommand}" Style="{StaticResource OutlinedButton}" Visibility="{Binding EditingExisting, Converter={StaticResource Visible}}" Margin="0,0,6,5" ToolTip="Create a separate snippet and keep the original · Ctrl+Shift+Enter" /><Button Content="{Binding EditorSaveLabel}" Style="{StaticResource PrimaryButton}" Command="{Binding SaveEditCommand}" ToolTip="Save · Ctrl+Enter" Margin="0,0,0,5" /></WrapPanel>
             </StackPanel>
           </Grid>
         </Grid>
@@ -287,6 +299,8 @@
                   </Grid>
                   <TextBlock Text="Smaller limits remove oldest unprotected clips when saved. Pins, favorites and saved snippets are kept. Oversized clips are skipped, never shortened." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="16" />
                   <TextBlock Text="PRIVACY" Style="{StaticResource SectionLabel}" Margin="0,26,0,10" />
+                  <CheckBox Content="Recover editor drafts after restart" IsChecked="{Binding Settings.RecoverDrafts}" Style="{StaticResource Switch}" />
+                  <TextBlock Text="One encrypted local draft, up to 1,048,576 characters, for seven days. Current privacy rules apply. Turning this off deletes the recovery copy; your open editor stays available. Drafts are excluded from backups." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,2,0,10" />
                   <CheckBox Content="Skip recognizable secret tokens" IsChecked="{Binding Settings.BlockSecrets}" Style="{StaticResource Switch}" />
                   <TextBlock Text="Best effort, not a password detector. Exclude sensitive apps below." FontSize="10" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,2,0,8" />
                   <CheckBox Content="Exclude our pastes from Windows history" IsChecked="{Binding Settings.PreventCloud}" Style="{StaticResource Switch}" />

@@ -19,6 +19,7 @@ public sealed record AppSettings
     public string Theme { get; init; } = "Light";
     public PasteDock.Core.Search.SearchSort HistorySort { get; init; } = PasteDock.Core.Search.SearchSort.BestMatch;
     public bool PreviewWrap { get; init; } = true;
+    public bool RecoverEditorDrafts { get; init; } = true;
     public uint HotkeyModifiers { get; init; } = 3; // MOD_ALT | MOD_CONTROL
     public uint HotkeyKey { get; init; } = 0x56;    // V
     public string HotkeyLabel { get; init; } = "Ctrl + Alt + V";
